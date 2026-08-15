@@ -269,7 +269,7 @@ def fuzzy_match(name, player_list, threshold=70):
     return best >= threshold, best, best_name
 
 # ── Data fetching (cached) ────────────────────────────────────────────────────
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=1800)
 def fetch_pga_schedule(tour_code):
     query = f"""
     {{
@@ -296,7 +296,7 @@ def fetch_pga_schedule(tour_code):
     except Exception as e:
         return [], []
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=1800)
 def fetch_pga_field(tournament_id):
     query = f"""
     {{
