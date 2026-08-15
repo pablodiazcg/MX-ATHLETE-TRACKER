@@ -1,12 +1,10 @@
-with open("/Users/pablodiazcg/Downloads/app.py", "w") as f:
-    f.write('''"""
+"""
 Mexican Athlete Tracker — Streamlit App
 Run with: streamlit run app.py
 """
 
 import streamlit as st
 import requests
-import json
 import unicodedata
 import concurrent.futures
 from datetime import datetime, timedelta
@@ -22,13 +20,13 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-  @import url(\'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap\');
-  html, body, [class*="css"] { font-family: \'Inter\', sans-serif; background-color: #0a0a0a; color: #f0f0f0; }
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap');
+  html, body, [class*="css"] { font-family: 'Inter', sans-serif; background-color: #0a0a0a; color: #f0f0f0; }
   .main { background-color: #0a0a0a; }
   .block-container { padding-top: 2rem; max-width: 1200px; }
   .hero { background: linear-gradient(135deg, #006847 0%, #0a0a0a 50%, #CE1126 100%); border-radius: 16px; padding: 2.5rem 3rem; margin-bottom: 2rem; position: relative; overflow: hidden; }
   .hero::before { content: "🇲🇽"; font-size: 180px; position: absolute; right: -20px; top: -20px; opacity: 0.08; }
-  .hero h1 { font-family: \'Bebas Neue\', sans-serif; font-size: 3.5rem; letter-spacing: 3px; margin: 0; color: #ffffff; line-height: 1; }
+  .hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; letter-spacing: 3px; margin: 0; color: #ffffff; line-height: 1; }
   .hero p { color: #aaaaaa; font-size: 1rem; margin-top: 0.5rem; font-weight: 300; }
   .hero .updated { font-size: 0.75rem; color: #666; margin-top: 1rem; }
   .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
@@ -41,9 +39,9 @@ st.markdown("""
   .event-card:hover { border-left-color: #CE1126; }
   .event-card .event-name { font-size: 1rem; font-weight: 600; color: #f0f0f0; margin: 0 0 0.25rem 0; }
   .event-card .event-meta { font-size: 0.8rem; color: #888; margin: 0; }
-  .event-card .event-date { font-family: \'Bebas Neue\', sans-serif; font-size: 1.1rem; color: #006847; letter-spacing: 1px; }
+  .event-card .event-date { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; color: #006847; letter-spacing: 1px; }
   .metric-box { background: #141414; border: 1px solid #222; border-radius: 10px; padding: 1rem; text-align: center; }
-  .metric-box .metric-val { font-family: \'Bebas Neue\', sans-serif; font-size: 2.2rem; color: #006847; line-height: 1; }
+  .metric-box .metric-val { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; color: #006847; line-height: 1; }
   .metric-box .metric-label { font-size: 0.7rem; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-top: 0.25rem; }
   section[data-testid="stSidebar"] { background-color: #0f0f0f; border-right: 1px solid #1e1e1e; }
   .no-results { text-align: center; padding: 3rem; color: #444; font-size: 1rem; }
@@ -53,6 +51,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# ── Constants ─────────────────────────────────────────────────────────────────
 PGA_HEADERS = {
     "User-Agent": "Mozilla/5.0",
     "Content-Type": "application/json",
@@ -107,28 +106,18 @@ LIV_SCHEDULE_2026 = [
     {"name": "LIV Golf Indianapolis", "start_date": "2026-08-23", "location": "Indianapolis, USA"},
 ]
 
-TOUR_CODES = {
-    "R": "PGA Tour",
-    "H": "Korn Ferry Tour",
-    "Y": "PGA Tour Americas",
-    "S": "Champions Tour",
-}
-
+# ── Helpers ───────────────────────────────────────────────────────────────────
 def badge(tour):
-    cls = {
-        "LIV Golf": "liv",
-        "PGA Tour": "pga",
-        "Korn Ferry Tour": "kft",
-        "PGA Tour Americas": "pta"
-    }.get(tour, "other")
-    return f\'<span class="badge badge-{cls}">{tour}</span>\'
+    cls = {"LIV Golf": "liv", "PGA Tour": "pga",
+           "Korn Ferry Tour": "kft", "PGA Tour Americas": "pta"}.get(tour, "other")
+    return f'<span class="badge badge-{cls}">{tour}</span>'
 
 def ts_to_date(ms):
-    return datetime.fromtimestamp(ms / 1000).strftime(\'%Y-%m-%d\')
+    return datetime.fromtimestamp(ms / 1000).strftime('%Y-%m-%d')
 
 def strip_accents(s):
-    return \'\'.join(c for c in unicodedata.normalize(\'NFD\', s)
-                   if unicodedata.category(c) != \'Mn\')
+    return ''.join(c for c in unicodedata.normalize('NFD', s)
+                   if unicodedata.category(c) != 'Mn')
 
 def fuzzy_match(name, player_list, threshold=80):
     """Match First Last against list that may use Last, First format."""
@@ -154,31 +143,7 @@ def fuzzy_match(name, player_list, threshold=80):
                 best, best_name = score, p
     return best >= threshold, best, best_name
 
-@st.cache_data(ttl=86400)
-def verify_nationality_from_api(name):
-    for tour_code in ["R", "H", "Y"]:
-        query = f"""
-        {{
-          playerDirectory(tourCode: {tour_code}, active: false) {{
-            players {{ id firstName lastName displayName country }}
-          }}
-        }}
-        """
-        try:
-            r = requests.post("https://orchestrator.pgatour.com/graphql",
-                              headers=PGA_HEADERS, json={"query": query}, timeout=10)
-            players = r.json()["data"]["playerDirectory"]["players"]
-            for p in players:
-                score = fuzz.token_sort_ratio(
-                    strip_accents(name.lower()),
-                    strip_accents(p["displayName"].lower())
-                )
-                if score >= 85:
-                    return True, p.get("country", "Unknown"), p["displayName"]
-        except:
-            continue
-    return False, "Not in API", name
-
+# ── API calls ─────────────────────────────────────────────────────────────────
 @st.cache_data(ttl=1800)
 def fetch_pga_schedule(tour_code):
     query = f"""
@@ -204,6 +169,7 @@ def fetch_pga_schedule(tour_code):
 
 @st.cache_data(ttl=1800)
 def fetch_pga_field(tournament_id):
+    # PGA Tour uses FieldPlayer, all others use PlayerField
     player_type = "FieldPlayer" if tournament_id.startswith("R") else "PlayerField"
     query = f"""
     {{
@@ -222,6 +188,31 @@ def fetch_pga_field(tournament_id):
     except:
         return []
 
+@st.cache_data(ttl=86400)
+def verify_nationality_from_api(name):
+    for tour_code in ["R", "H", "Y"]:
+        query = f"""
+        {{
+          playerDirectory(tourCode: {tour_code}, active: false) {{
+            players {{ displayName country }}
+          }}
+        }}
+        """
+        try:
+            r = requests.post("https://orchestrator.pgatour.com/graphql",
+                              headers=PGA_HEADERS, json={"query": query}, timeout=10)
+            players = r.json()["data"]["playerDirectory"]["players"]
+            for p in players:
+                score = fuzz.token_sort_ratio(
+                    strip_accents(name.lower()),
+                    strip_accents(p["displayName"].lower())
+                )
+                if score >= 85:
+                    return True, p.get("country", "Unknown"), p["displayName"]
+        except:
+            continue
+    return False, "Not in API", name
+
 def fetch_event_and_search(t, targets, tour_name):
     field = fetch_pga_field(t["id"])
     results = []
@@ -232,10 +223,9 @@ def fetch_event_and_search(t, targets, tour_name):
         if matched:
             results.append({
                 "athlete": name,
-                "matched_as": matched_as,
                 "name": t["tournamentName"],
                 "date": ts_to_date(t["startDate"]),
-                "location": f"{t.get(\'city\',\'\')} {t.get(\'country\',\'\')}".strip(),
+                "location": f"{t.get('city', '')} {t.get('country', '')}".strip(),
                 "tour": tour_name,
                 "purse": t.get("purse", "")
             })
@@ -244,7 +234,7 @@ def fetch_event_and_search(t, targets, tour_name):
 def build_athlete_data(mexican_golfers):
     athletes = {name: {"events": [], "tour": "Unknown"} for name in mexican_golfers}
 
-    # LIV Golf
+    # LIV Golf — hardcoded roster
     for name in mexican_golfers:
         matched, score, _ = fuzzy_match(name, LIV_ROSTER_2026, threshold=85)
         if matched:
@@ -258,14 +248,13 @@ def build_athlete_data(mexican_golfers):
                     "purse": "N/A"
                 })
 
-    # PGA Tour, Korn Ferry, PGA Tour Americas
+    # PGA Tour (R), Korn Ferry (H), PGA Tour Americas (Y)
     for tour_code, tour_name in [("R", "PGA Tour"), ("H", "Korn Ferry Tour"), ("Y", "PGA Tour Americas")]:
         upcoming, completed = fetch_pga_schedule(tour_code)
         all_events = upcoming + completed
-
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
             futures = [executor.submit(fetch_event_and_search, t, mexican_golfers, tour_name)
-                      for t in all_events]
+                       for t in all_events]
             for future in concurrent.futures.as_completed(futures):
                 for entry in future.result():
                     name = entry["athlete"]
@@ -284,11 +273,11 @@ with st.sidebar:
 
     athlete_input = st.text_area(
         "Athletes:",
-        value="\\n".join(DEFAULT_MEXICAN_GOLFERS),
+        value="\n".join(DEFAULT_MEXICAN_GOLFERS),
         height=250,
         label_visibility="collapsed"
     )
-    MEXICAN_GOLFERS = [a.strip() for a in athlete_input.strip().split("\\n") if a.strip()]
+    MEXICAN_GOLFERS = [a.strip() for a in athlete_input.strip().split("\n") if a.strip()]
 
     st.markdown("---")
     st.markdown("**🔍 Search**")
@@ -315,14 +304,14 @@ with st.sidebar:
         st.rerun()
 
     st.markdown("---")
-    st.caption("PGA Tour · Korn Ferry · PGA Tour Americas: live API\\nLIV Golf: 2026 hardcoded\\nRefreshes every 30 min")
+    st.caption("PGA Tour · Korn Ferry · PGA Tour Americas: live API\nLIV Golf: 2026 hardcoded\nRefreshes every 30 min")
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero">
   <h1>MEXICAN ATHLETE TRACKER</h1>
   <p>Professional golf — worldwide competitions — live data</p>
-  <div class="updated">Last updated: """ + datetime.now().strftime(\'%B %d, %Y at %H:%M\') + """</div>
+  <div class="updated">Last updated: """ + datetime.now().strftime('%B %d, %Y at %H:%M') + """</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -362,6 +351,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 tab1, tab2, tab3 = st.tabs(["👤 By Athlete", "📅 Upcoming Events", "🗺️ All Schedules"])
 
+# TAB 1 — By Athlete
 with tab1:
     if verify_on:
         with st.expander("🌍 Nationality Verification", expanded=False):
@@ -370,12 +360,13 @@ with tab1:
                 if found and country == "Mexico":
                     st.markdown(f"✅ **{name}** — confirmed Mexico")
                 elif found:
-                    st.markdown(f"⚠️ **{name}** — API shows country = **{country}** (verify!)")
+                    st.markdown(f"⚠️ **{name}** — API shows **{country}** (verify!)")
                 else:
                     st.markdown(f"❓ **{name}** — not in PGA/KFT/PTA API (may be LIV or other tour)")
 
     if not filtered_athletes:
-        st.markdown(\'<div class="no-results">No athletes match your search.</div>\', unsafe_allow_html=True)
+        st.markdown('<div class="no-results">No athletes match your search.</div>',
+                    unsafe_allow_html=True)
     else:
         for name in filtered_athletes:
             data = athlete_data.get(name, {"events": [], "tour": "Unknown"})
@@ -389,7 +380,8 @@ with tab1:
             if tour == "Korn Ferry Tour" and not show_kft: continue
             if tour == "PGA Tour Americas" and not show_pta: continue
 
-            with st.expander(f"{\'🟢\' if upcoming else \'⚪\'} {name}  —  {tour}", expanded=bool(upcoming)):
+            with st.expander(f"{'🟢' if upcoming else '⚪'} {name}  —  {tour}",
+                             expanded=bool(upcoming)):
                 col_a, col_b = st.columns([3, 1])
                 with col_a:
                     st.markdown(f"**{name}**")
@@ -397,7 +389,7 @@ with tab1:
                 with col_b:
                     st.markdown(f"""
                     <div style="text-align:right">
-                      <div style="font-family:\'Bebas Neue\',sans-serif;font-size:2rem;color:#006847">{len(upcoming)}</div>
+                      <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:#006847">{len(upcoming)}</div>
                       <div style="font-size:0.7rem;color:#666;text-transform:uppercase">Upcoming</div>
                     </div>""", unsafe_allow_html=True)
 
@@ -408,10 +400,10 @@ with tab1:
                         <div class="event-card">
                           <div style="display:flex;justify-content:space-between;align-items:center">
                             <div>
-                              <p class="event-name">{e[\'name\']} <span class="upcoming-pill">upcoming</span></p>
-                              <p class="event-meta">📍 {e[\'location\']} &nbsp;|&nbsp; {badge(e[\'tour\'])}</p>
+                              <p class="event-name">{e['name']} <span class="upcoming-pill">upcoming</span></p>
+                              <p class="event-meta">📍 {e['location']} &nbsp;|&nbsp; {badge(e['tour'])}</p>
                             </div>
-                            <div class="event-date">{e[\'date\']}</div>
+                            <div class="event-date">{e['date']}</div>
                           </div>
                         </div>""", unsafe_allow_html=True)
                 else:
@@ -424,13 +416,14 @@ with tab1:
                             <div class="event-card" style="opacity:0.5">
                               <div style="display:flex;justify-content:space-between">
                                 <div>
-                                  <p class="event-name">{e[\'name\']}</p>
-                                  <p class="event-meta">📍 {e[\'location\']}</p>
+                                  <p class="event-name">{e['name']}</p>
+                                  <p class="event-meta">📍 {e['location']}</p>
                                 </div>
-                                <div class="event-date">{e[\'date\']}</div>
+                                <div class="event-date">{e['date']}</div>
                               </div>
                             </div>""", unsafe_allow_html=True)
 
+# TAB 2 — Upcoming Events
 with tab2:
     all_upcoming = []
     for name in MEXICAN_GOLFERS:
@@ -449,40 +442,38 @@ with tab2:
     else:
         for date, group in groupby(all_upcoming, key=lambda x: x["date"]):
             events = list(group)
-            st.markdown(f"#### 📆 {datetime.strptime(date, \'%Y-%m-%d\').strftime(\'%B %d, %Y\')}")
+            st.markdown(f"#### 📆 {datetime.strptime(date, '%Y-%m-%d').strftime('%B %d, %Y')}")
             for e in events:
-                purse_str = f"&nbsp;|&nbsp; 💰 {e[\'purse\']}" if e.get("purse") and e["purse"] not in ["N/A", "$0", ""] else ""
+                purse_str = f"&nbsp;|&nbsp; 💰 {e['purse']}" if e.get("purse") and e["purse"] not in ["N/A", "$0", ""] else ""
                 st.markdown(f"""
                 <div class="event-card">
                   <div style="display:flex;justify-content:space-between;align-items:center">
                     <div>
-                      <p class="event-name">{e[\'name\']}</p>
-                      <p class="event-meta">🏌️ <strong>{e[\'athlete\']}</strong> &nbsp;|&nbsp; 📍 {e[\'location\']} &nbsp;|&nbsp; {badge(e[\'tour\'])}{purse_str}</p>
+                      <p class="event-name">{e['name']}</p>
+                      <p class="event-meta">🏌️ <strong>{e['athlete']}</strong> &nbsp;|&nbsp;
+                      📍 {e['location']} &nbsp;|&nbsp; {badge(e['tour'])}{purse_str}</p>
                     </div>
                   </div>
                 </div>""", unsafe_allow_html=True)
 
+# TAB 3 — All Schedules
 with tab3:
     st.markdown("#### Full 2026 Schedules")
     sub1, sub2, sub3, sub4 = st.tabs(["PGA Tour", "Korn Ferry", "PGA Tour Americas", "LIV Golf"])
 
-    for sub, code, label in [
-        (sub1, "R", "PGA Tour"),
-        (sub2, "H", "Korn Ferry Tour"),
-        (sub3, "Y", "PGA Tour Americas"),
-    ]:
+    for sub, code in [(sub1, "R"), (sub2, "H"), (sub3, "Y")]:
         with sub:
             up, comp = fetch_pga_schedule(code)
             for t in sorted(up + comp, key=lambda x: x["startDate"]):
                 date = ts_to_date(t["startDate"])
                 is_up = date >= today
-                pill = \'<span class="upcoming-pill">upcoming</span>\' if is_up else \'<span class="past-pill">completed</span>\'
+                pill = '<span class="upcoming-pill">upcoming</span>' if is_up else '<span class="past-pill">completed</span>'
                 st.markdown(f"""
-                <div class="event-card" style="opacity:{\'1\' if is_up else \'0.4\'}">
+                <div class="event-card" style="opacity:{'1' if is_up else '0.4'}">
                   <div style="display:flex;justify-content:space-between;align-items:center">
                     <div>
-                      <p class="event-name">{t[\'tournamentName\']} &nbsp;{pill}</p>
-                      <p class="event-meta">📍 {t.get(\'city\',\'\')}, {t.get(\'country\',\'\')} &nbsp;|&nbsp; 💰 {t.get(\'purse\',\'\')}</p>
+                      <p class="event-name">{t['tournamentName']} &nbsp;{pill}</p>
+                      <p class="event-meta">📍 {t.get('city','')}, {t.get('country','')} &nbsp;|&nbsp; 💰 {t.get('purse','')}</p>
                     </div>
                     <div class="event-date">{date}</div>
                   </div>
@@ -491,16 +482,14 @@ with tab3:
     with sub4:
         for e in LIV_SCHEDULE_2026:
             is_up = e["start_date"] >= today
-            pill = \'<span class="upcoming-pill">upcoming</span>\' if is_up else \'<span class="past-pill">completed</span>\'
+            pill = '<span class="upcoming-pill">upcoming</span>' if is_up else '<span class="past-pill">completed</span>'
             st.markdown(f"""
-            <div class="event-card" style="opacity:{\'1\' if is_up else \'0.4\'}">
+            <div class="event-card" style="opacity:{'1' if is_up else '0.4'}">
               <div style="display:flex;justify-content:space-between;align-items:center">
                 <div>
-                  <p class="event-name">{e[\'name\']} &nbsp;{pill}</p>
-                  <p class="event-meta">📍 {e[\'location\']}</p>
+                  <p class="event-name">{e['name']} &nbsp;{pill}</p>
+                  <p class="event-meta">📍 {e['location']}</p>
                 </div>
-                <div class="event-date">{e[\'start_date\']}</div>
+                <div class="event-date">{e['start_date']}</div>
               </div>
             </div>""", unsafe_allow_html=True)
-''')
-print("Done! app.py saved to Downloads.")
