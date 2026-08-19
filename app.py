@@ -52,6 +52,50 @@ DEFAULT_MEXICAN_GOLFERS = [
     "Gaby Lopez","Isabella Fierro","Lauren Olivares","Maria Fassi",
 ]
 
+
+LPGA_SCHEDULE_2026 = [
+    {"name": "Hilton Grand Vacations Tournament of Champions", "start_date": "2026-02-01", "location": "Florida, USA",      "purse": "$2,100,000"},
+    {"name": "Honda LPGA Thailand",                            "start_date": "2026-02-22", "location": "Thailand",           "purse": "$1,800,000"},
+    {"name": "HSBC Women's World Championship",                "start_date": "2026-03-01", "location": "Singapore",          "purse": "$3,000,000"},
+    {"name": "Blue Bay LPGA",                                  "start_date": "2026-03-08", "location": "China",              "purse": "$2,600,000"},
+    {"name": "Fortinet Founders Cup",                          "start_date": "2026-03-22", "location": "California, USA",    "purse": "$3,000,000"},
+    {"name": "Ford Championship",                              "start_date": "2026-03-29", "location": "Arizona, USA",       "purse": "$2,250,000"},
+    {"name": "Aramco Championship",                            "start_date": "2026-04-05", "location": "Nevada, USA",        "purse": "$4,000,000"},
+    {"name": "JM Eagle LA Championship",                       "start_date": "2026-04-19", "location": "California, USA",    "purse": "$3,750,000"},
+    {"name": "Chevron Championship",                           "start_date": "2026-04-26", "location": "Texas, USA",         "purse": "$8,000,000"},
+    {"name": "Riviera Maya Open",                              "start_date": "2026-05-03", "location": "Mexico",             "purse": "$2,500,000"},
+    {"name": "Mizuho Americas Open",                           "start_date": "2026-05-10", "location": "New Jersey, USA",    "purse": "$3,250,000"},
+    {"name": "Kroger Queen City Championship",                 "start_date": "2026-05-17", "location": "Ohio, USA",          "purse": "$2,000,000"},
+    {"name": "ShopRite LPGA Classic",                          "start_date": "2026-05-31", "location": "New Jersey, USA",    "purse": "$2,000,000"},
+    {"name": "U.S. Women Open",                                "start_date": "2026-06-07", "location": "California, USA",    "purse": "$12,000,000"},
+    {"name": "Meijer LPGA Classic",                            "start_date": "2026-06-15", "location": "Michigan, USA",      "purse": "$3,000,000"},
+    {"name": "Dow Championship",                               "start_date": "2026-06-21", "location": "Michigan, USA",      "purse": "$3,250,000"},
+    {"name": "KPMG Women PGA Championship",                    "start_date": "2026-06-28", "location": "Minnesota, USA",     "purse": "$12,000,000"},
+    {"name": "Amundi Evian Championship",                      "start_date": "2026-07-12", "location": "France",             "purse": "$8,000,000"},
+    {"name": "ISPS Handa Women Scottish Open",                 "start_date": "2026-07-26", "location": "Scotland",           "purse": "$2,000,000"},
+    {"name": "AIG Women Open",                                 "start_date": "2026-08-02", "location": "Wales",              "purse": "$9,750,000"},
+    {"name": "Portland Classic",                               "start_date": "2026-08-16", "location": "Oregon, USA",        "purse": "$2,000,000"},
+    {"name": "CPKC Women Open",                                "start_date": "2026-08-23", "location": "Canada",             "purse": "$2,750,000"},
+    {"name": "FM Championship",                                "start_date": "2026-08-30", "location": "Massachusetts, USA", "purse": "$4,400,000"},
+    {"name": "Walmart NW Arkansas Championship",               "start_date": "2026-09-27", "location": "Arkansas, USA",      "purse": "$3,000,000"},
+    {"name": "Lotte Championship",                             "start_date": "2026-10-04", "location": "Hawaii, USA",        "purse": "$3,000,000"},
+    {"name": "Buick LPGA Shanghai",                            "start_date": "2026-10-18", "location": "China",              "purse": "$3,200,000"},
+    {"name": "BMW Ladies Championship",                        "start_date": "2026-10-25", "location": "South Korea",        "purse": "$2,350,000"},
+    {"name": "Maybank Championship",                           "start_date": "2026-11-01", "location": "Malaysia",           "purse": "$3,000,000"},
+    {"name": "Toto Japan Classic",                             "start_date": "2026-11-08", "location": "Japan",              "purse": "$2,100,000"},
+    {"name": "The Annika",                                     "start_date": "2026-11-15", "location": "Florida, USA",       "purse": "$3,250,000"},
+    {"name": "CME Group Tour Championship",                    "start_date": "2026-11-22", "location": "Florida, USA",       "purse": "$11,000,000"},
+]
+
+LPGA_MEXICAN_PLAYERS = [
+    "Gaby Lopez",
+    "Maria Fassi",
+    "Isabella Fierro",
+    "Lauren Olivares",
+]
+
+LPGA_BUILD_BLOCK = True  # marker
+
 LIV_ROSTER_2026 = [
     "Joaquin Niemann","Abraham Ancer","Sebastian Munoz","Carlos Ortiz",
     "Dustin Johnson","Thomas Detry","Thomas Pieters","Anthony Kim",
