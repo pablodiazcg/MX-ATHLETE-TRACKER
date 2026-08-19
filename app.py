@@ -210,6 +210,19 @@ def build_athlete_data(mexican_golfers):
             athletes[name]["tour"] = "LIV Golf"
             for e in LIV_SCHEDULE_2026:
                 athletes[name]["events"].append({"name":e["name"],"date":e["start_date"],"location":e["location"],"tour":"LIV Golf","purse":"N/A"})
+    # LPGA Tour
+    for name in mexican_golfers:
+        if name in LPGA_MEXICAN_PLAYERS:
+            athletes[name]["tour"] = "LPGA Tour"
+            for e in LPGA_SCHEDULE_2026:
+                athletes[name]["events"].append({
+                    "name": e["name"],
+                    "date": e["start_date"],
+                    "location": e["location"],
+                    "tour": "LPGA Tour",
+                    "purse": e["purse"]
+                })
+
     for tour_code, tour_name in [("R","PGA Tour"),("H","Korn Ferry Tour"),("Y","PGA Tour Americas")]:
         upcoming, completed = fetch_pga_schedule(tour_code)
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as ex:
