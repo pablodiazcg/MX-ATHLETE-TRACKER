@@ -312,9 +312,15 @@ with tab1:
                 with cb:
                     st.markdown(f'<div style="text-align:right"><div style="font-family:Bebas Neue,sans-serif;font-size:2rem;color:#006847">{len(upcoming)}</div><div style="font-size:0.7rem;color:#666;text-transform:uppercase">Upcoming</div></div>', unsafe_allow_html=True)
                 if upcoming:
-                    st.markdown("**Upcoming Events:**")
-                    for e in upcoming:
-                        st.markdown(f'<div class="event-card"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span class="upcoming-pill">upcoming</span></p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
+                    if tour == "LPGA Tour":
+                        st.markdown("**📅 Season Schedule** *(field entry not confirmed per event)*")
+                        st.caption("⚠️ LPGA fields are posted Tuesday of event week. All events shown are on the 2026 tour calendar.")
+                        for e in upcoming:
+                            st.markdown(f'<div class="event-card" style="border-left-color:#f48fb1"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span style="background:#2a1a2e;color:#f48fb1;border:1px solid #f48fb1;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px">possible</span></p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])} &nbsp;|&nbsp; 💰 {e["purse"]}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
+                    else:
+                        st.markdown("**Upcoming Events:**")
+                        for e in upcoming:
+                            st.markdown(f'<div class="event-card"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span class="upcoming-pill">upcoming</span></p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
                 else:
                     st.markdown("*No upcoming events in selected time range.*")
                 if past:
