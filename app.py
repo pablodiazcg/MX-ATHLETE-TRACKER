@@ -253,6 +253,29 @@ with st.sidebar:
     st.markdown("---")
     weeks_ahead = st.slider("📅 Weeks ahead", 1, 16, 8)
     st.markdown("---")
+    st.markdown("---")
+    st.markdown("**🏌️ LPGA Confirmed Entries** *(update Tuesday of event week)*")
+    st.caption("Format: Player Name | Tournament Name")
+    lpga_confirmed_input = st.text_area(
+        "Confirmed:",
+        value="",
+        height=100,
+        placeholder="Gaby Lopez | Walmart NW Arkansas Championship\nMaria Fassi | Walmart NW Arkansas Championship",
+        label_visibility="collapsed"
+    )
+    # Parse confirmed entries
+    LPGA_CONFIRMED = {}
+    for line in lpga_confirmed_input.strip().split("\n"):
+        if "|" in line:
+            parts = line.split("|")
+            if len(parts) == 2:
+                player = parts[0].strip()
+                event = parts[1].strip()
+                if player not in LPGA_CONFIRMED:
+                    LPGA_CONFIRMED[player] = []
+                LPGA_CONFIRMED[player].append(event)
+
+    st.markdown("---")
     verify_on = st.checkbox("✅ Nationality verification", value=False)
     st.caption("Confirms Mexican nationality via API. Slower.")
     if st.button("🔄 Refresh Data", use_container_width=True):
@@ -313,10 +336,23 @@ with tab1:
                     st.markdown(f'<div style="text-align:right"><div style="font-family:Bebas Neue,sans-serif;font-size:2rem;color:#006847">{len(upcoming)}</div><div style="font-size:0.7rem;color:#666;text-transform:uppercase">Upcoming</div></div>', unsafe_allow_html=True)
                 if upcoming:
                     if tour == "LPGA Tour":
-                        st.markdown("**📅 Season Schedule** *(field entry not confirmed per event)*")
-                        st.caption("⚠️ LPGA fields are posted Tuesday of event week. All events shown are on the 2026 tour calendar.")
-                        for e in upcoming:
-                            st.markdown(f'<div class="event-card" style="border-left-color:#f48fb1"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span style="background:#2a1a2e;color:#f48fb1;border:1px solid #f48fb1;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px">possible</span></p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])} &nbsp;|&nbsp; 💰 {e["purse"]}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
+                        confirmed_for_player = LPGA_CONFIRMED.get(name, [])
+                        confirmed_events = [e for e in upcoming if any(
+                            fuzz.token_sort_ratio(e["name"].lower(), c.lower()) >= 80
+                            for c in confirmed_for_player
+                        )]
+                        possible_events = [e for e in upcoming if e not in confirmed_events]
+
+                        if confirmed_events:
+                            st.markdown("**✅ Confirmed Entries:**")
+                            for e in confirmed_events:
+                                st.markdown(f'<div class="event-card" style="border-left-color:#66bb6a"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span class="upcoming-pill">confirmed</span></p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])} &nbsp;|&nbsp; 💰 {e["purse"]}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
+
+                        if possible_events:
+                            st.markdown("**📅 Season Schedule** *(entry not confirmed)*")
+                            st.caption("⚠️ LPGA fields post Tuesday of event week.")
+                            for e in possible_events:
+                                st.markdown(f'<div class="event-card" style="border-left-color:#f48fb1"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span style="background:#2a1a2e;color:#f48fb1;border:1px solid #f48fb1;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px">possible</span></p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])} &nbsp;|&nbsp; 💰 {e["purse"]}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
                     else:
                         st.markdown("**Upcoming Events:**")
                         for e in upcoming:
