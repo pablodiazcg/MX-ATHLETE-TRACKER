@@ -26,6 +26,7 @@ st.markdown("""
   .badge-kft { background: #2e2a1a; color: #ffa726; border: 1px solid #ffa726; }
   .badge-pta { background: #2e1a2e; color: #ce93d8; border: 1px solid #ce93d8; }
   .badge-lpga { background: #1a1a2e; color: #f48fb1; border: 1px solid #f48fb1; }
+  .badge-asian { background: #1a2e2e; color: #80cbc4; border: 1px solid #80cbc4; }
   .badge-other { background: #1a1a1a; color: #aaaaaa; border: 1px solid #444; }
   .event-card { background: #141414; border: 1px solid #222; border-left: 4px solid #006847; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
   .event-card .event-name { font-size: 1rem; font-weight: 600; color: #f0f0f0; margin: 0 0 0.25rem 0; }
@@ -95,6 +96,33 @@ LPGA_MEXICAN_PLAYERS = [
 ]
 
 LPGA_BUILD_BLOCK = True  # marker
+
+
+# 2026 Asian Tour + International Series Schedule
+ASIAN_TOUR_SCHEDULE_2026 = [
+    {"name": "Philippine Golf Championship",  "start_date": "2026-02-08", "location": "Philippines",     "purse": "$500,000",   "series": "Asian Tour"},
+    {"name": "New Zealand Open",              "start_date": "2026-03-01", "location": "New Zealand",      "purse": "$2,000,000", "series": "Asian Tour"},
+    {"name": "International Series Japan",    "start_date": "2026-04-05", "location": "Japan",            "purse": "$2,000,000", "series": "International Series"},
+    {"name": "Singapore Open",               "start_date": "2026-04-26", "location": "Singapore",        "purse": "$2,000,000", "series": "International Series"},
+    {"name": "GS Caltex Maekyung Open",      "start_date": "2026-05-03", "location": "South Korea",      "purse": "$1,300,000", "series": "Asian Tour"},
+    {"name": "Taiwan Glass Taifong Open",    "start_date": "2026-05-10", "location": "Taiwan",           "purse": "$500,000",   "series": "Asian Tour"},
+    {"name": "Kolon Korea Open",             "start_date": "2026-05-24", "location": "South Korea",      "purse": "$1,400,000", "series": "Asian Tour"},
+    {"name": "International Series Morocco", "start_date": "2026-06-14", "location": "Morocco",          "purse": "$2,000,000", "series": "International Series"},
+    {"name": "Yeangder Taiwan Open",         "start_date": "2026-09-20", "location": "Taiwan",           "purse": "$1,200,000", "series": "Asian Tour"},
+    {"name": "Mercuries Taiwan Masters",     "start_date": "2026-09-27", "location": "Taiwan",           "purse": "$1,200,000", "series": "Asian Tour"},
+    {"name": "International Series India",   "start_date": "2026-10-11", "location": "India",            "purse": "$2,000,000", "series": "International Series"},
+    {"name": "SJM Macao Open",              "start_date": "2026-10-18", "location": "Macau",            "purse": "$1,000,000", "series": "Asian Tour"},
+    {"name": "Link Hong Kong Open",          "start_date": "2026-10-25", "location": "Hong Kong",        "purse": "$2,000,000", "series": "International Series"},
+    {"name": "International Series China",   "start_date": "2026-11-08", "location": "China",            "purse": "$2,000,000", "series": "International Series"},
+    {"name": "Philippine Open",             "start_date": "2026-11-15", "location": "Philippines",      "purse": "$2,000,000", "series": "International Series"},
+    {"name": "PIF Saudi International",      "start_date": "2026-11-21", "location": "Saudi Arabia",     "purse": "$5,000,000", "series": "International Series"},
+]
+
+# Mexican players on Asian Tour / International Series
+ASIAN_TOUR_MEXICAN_PLAYERS = [
+    "Santiago de La Fuente",
+    "Carlos Ortiz",  # plays International Series events alongside LIV
+]
 
 LIV_ROSTER_2026 = [
     "Joaquin Niemann","Abraham Ancer","Sebastian Munoz","Carlos Ortiz",
@@ -210,6 +238,24 @@ def build_athlete_data(mexican_golfers):
             athletes[name]["tour"] = "LIV Golf"
             for e in LIV_SCHEDULE_2026:
                 athletes[name]["events"].append({"name":e["name"],"date":e["start_date"],"location":e["location"],"tour":"LIV Golf","purse":"N/A"})
+
+    # Asian Tour / International Series
+    for name in mexican_golfers:
+        if name in ASIAN_TOUR_MEXICAN_PLAYERS:
+            if athletes[name]["tour"] == "Unknown":
+                athletes[name]["tour"] = "Asian Tour"
+            for e in ASIAN_TOUR_SCHEDULE_2026:
+                # Carlos Ortiz only plays International Series, not all Asian Tour events
+                if name == "Carlos Ortiz" and e["series"] != "International Series":
+                    continue
+                athletes[name]["events"].append({
+                    "name": e["name"],
+                    "date": e["start_date"],
+                    "location": e["location"],
+                    "tour": f"Asian Tour — {e['series']}",
+                    "purse": e["purse"]
+                })
+
     # LPGA Tour
     for name in mexican_golfers:
         if name in LPGA_MEXICAN_PLAYERS:
@@ -250,6 +296,7 @@ with st.sidebar:
     show_kft = st.checkbox("Korn Ferry", value=True)
     show_pta = st.checkbox("PGA Tour Americas", value=True)
     show_lpga = st.checkbox("LPGA Tour", value=True)
+    show_asian = st.checkbox("Asian Tour", value=True)
     st.markdown("---")
     weeks_ahead = st.slider("📅 Weeks ahead", 1, 16, 8)
     st.markdown("---")
@@ -382,7 +429,7 @@ with tab2:
 
 with tab3:
     st.markdown("#### Full 2026 Schedules")
-    sub1,sub2,sub3,sub4,sub5 = st.tabs(["PGA Tour","Korn Ferry","PGA Tour Americas","LIV Golf","LPGA Tour"])
+    sub1,sub2,sub3,sub4,sub5,sub6 = st.tabs(["PGA Tour","Korn Ferry","PGA Tour Americas","LIV Golf","LPGA Tour","Asian Tour"])
     for sub,code in [(sub1,"R"),(sub2,"H"),(sub3,"Y")]:
         with sub:
             up,comp = fetch_pga_schedule(code)
@@ -402,3 +449,11 @@ with tab3:
             is_up = e["start_date"] >= today
             pill = '<span class="upcoming-pill">upcoming</span>' if is_up else '<span class="past-pill">completed</span>'
             st.markdown(f'<div class="event-card" style="opacity:{"1" if is_up else "0.4"}"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} &nbsp;{pill}</p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; 💰 {e["purse"]}</p></div><div class="event-date">{e["start_date"]}</div></div></div>', unsafe_allow_html=True)
+
+    with sub6:
+        st.caption("🌏 Asian Tour + International Series — Santiago de La Fuente & Carlos Ortiz (Int'l Series only)")
+        for e in ASIAN_TOUR_SCHEDULE_2026:
+            is_up = e["start_date"] >= today
+            pill = '<span class="upcoming-pill">upcoming</span>' if is_up else '<span class="past-pill">completed</span>'
+            series_badge = '<span style="background:#1a2e2e;color:#80cbc4;border:1px solid #80cbc4;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px">Int\'l Series</span>' if e["series"] == "International Series" else '<span style="background:#1a1a1a;color:#aaa;border:1px solid #444;border-radius:20px;padding:2px 8px;font-size:0.65rem;letter-spacing:1px">Asian Tour</span>'
+            st.markdown(f'<div class="event-card" style="opacity:{"1" if is_up else "0.4"}"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} &nbsp;{pill} &nbsp;{series_badge}</p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; 💰 {e["purse"]}</p></div><div class="event-date">{e["start_date"]}</div></div></div>', unsafe_allow_html=True)
