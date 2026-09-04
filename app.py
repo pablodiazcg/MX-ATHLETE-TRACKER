@@ -375,16 +375,17 @@ with st.sidebar:
         placeholder="Santiago de La Fuente | VidantaWorld Mexico Open",
         label_visibility="collapsed"
     )
-    MANUAL_EXEMPTIONS = {}
+    parsed_exemptions = {}
     for line in exemptions_input.strip().split("\n"):
         if "|" in line:
             parts = line.split("|")
             if len(parts) == 2:
                 player = parts[0].strip()
                 event = parts[1].strip()
-                if player not in MANUAL_EXEMPTIONS:
-                    MANUAL_EXEMPTIONS[player] = []
-                MANUAL_EXEMPTIONS[player].append(event)
+                if player not in parsed_exemptions:
+                    parsed_exemptions[player] = []
+                parsed_exemptions[player].append(event)
+    st.session_state["manual_exemptions"] = parsed_exemptions
 
     st.markdown("---")
     st.markdown("**🏌️ LPGA Confirmed Entries** *(update Tuesday of event week)*")
@@ -396,17 +397,18 @@ with st.sidebar:
         placeholder="Gaby Lopez | Walmart NW Arkansas Championship\nMaria Fassi | Walmart NW Arkansas Championship",
         label_visibility="collapsed"
     )
-    # Parse confirmed entries
-    LPGA_CONFIRMED = {}
+    # Save LPGA confirmed to session_state
+    parsed_lpga = {}
     for line in lpga_confirmed_input.strip().split("\n"):
         if "|" in line:
             parts = line.split("|")
             if len(parts) == 2:
                 player = parts[0].strip()
                 event = parts[1].strip()
-                if player not in LPGA_CONFIRMED:
-                    LPGA_CONFIRMED[player] = []
-                LPGA_CONFIRMED[player].append(event)
+                if player not in parsed_lpga:
+                    parsed_lpga[player] = []
+                parsed_lpga[player].append(event)
+    st.session_state["lpga_confirmed"] = parsed_lpga
 
     st.markdown("---")
     verify_on = st.checkbox("✅ Nationality verification", value=False)
@@ -424,8 +426,12 @@ st.markdown("""<div class="hero"><h1>MEXICAN ATHLETE TRACKER</h1>
 <p>Professional golf — worldwide competitions — live data</p>
 <div class="updated">Last updated: """ + datetime.now().strftime('%B %d, %Y at %H:%M') + """</div></div>""", unsafe_allow_html=True)
 
+# Get exemptions and confirmed from session_state
+manual_exemptions = st.session_state.get("manual_exemptions", {})
+lpga_confirmed = st.session_state.get("lpga_confirmed", {})
+
 with st.spinner("Fetching live tournament data across all tours..."):
-    athlete_data = build_athlete_data(MEXICAN_GOLFERS, MANUAL_EXEMPTIONS)
+    athlete_data = build_athlete_data(MEXICAN_GOLFERS, manual_exemptions)
 
 today = datetime.now().strftime("%Y-%m-%d")
 cutoff = (datetime.now()+timedelta(weeks=weeks_ahead)).strftime("%Y-%m-%d")
@@ -472,7 +478,7 @@ with tab1:
                     st.markdown(f'<div style="text-align:right"><div style="font-family:Bebas Neue,sans-serif;font-size:2rem;color:#006847">{len(upcoming)}</div><div style="font-size:0.7rem;color:#666;text-transform:uppercase">Upcoming</div></div>', unsafe_allow_html=True)
                 if upcoming:
                     if tour == "LPGA Tour":
-                        confirmed_for_player = LPGA_CONFIRMED.get(name, [])
+                        confirmed_for_player = lpga_confirmed.get(name, [])
                         confirmed_events = [e for e in upcoming if any(
                             fuzz.token_sort_ratio(e["name"].lower(), c.lower()) >= 80
                             for c in confirmed_for_player
