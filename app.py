@@ -386,6 +386,8 @@ with st.sidebar:
                     parsed_exemptions[player] = []
                 parsed_exemptions[player].append(event)
     st.session_state["manual_exemptions"] = parsed_exemptions
+    if st.button("✅ Apply Exemptions", use_container_width=True):
+        st.rerun()
 
     st.markdown("---")
     st.markdown("**🏌️ LPGA Confirmed Entries** *(update Tuesday of event week)*")
@@ -409,6 +411,8 @@ with st.sidebar:
                     parsed_lpga[player] = []
                 parsed_lpga[player].append(event)
     st.session_state["lpga_confirmed"] = parsed_lpga
+    if st.button("✅ Apply LPGA Entries", use_container_width=True):
+        st.rerun()
 
     st.markdown("---")
     verify_on = st.checkbox("✅ Nationality verification", value=False)
@@ -562,4 +566,3 @@ with tab3:
             pill = '<span class="upcoming-pill">upcoming</span>' if is_up else '<span class="past-pill">completed</span>'
             series_badge = '<span style="background:#1a2e2e;color:#80cbc4;border:1px solid #80cbc4;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px">Int\'l Series</span>' if e["series"] == "International Series" else '<span style="background:#1a1a1a;color:#aaa;border:1px solid #444;border-radius:20px;padding:2px 8px;font-size:0.65rem;letter-spacing:1px">Asian Tour</span>'
             st.markdown(f'<div class="event-card" style="opacity:{"1" if is_up else "0.4"}"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} &nbsp;{pill} &nbsp;{series_badge}</p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; 💰 {e["purse"]}</p></div><div class="event-date">{e["start_date"]}</div></div></div>', unsafe_allow_html=True)
-
