@@ -263,15 +263,31 @@ def get_possible_events(name, upcoming_by_tour, manual_exemptions):
                 "status": "possible"
             })
 
-    # Manual exemptions
+    # Manual exemptions — look up date from known schedules
     exemptions = manual_exemptions.get(name, [])
+    all_known_events = (
+        [(t["tournamentName"], ts_to_date(t["startDate"]), t.get("city","") + " " + t.get("country",""), t.get("purse",""), "PGA Tour") for t in upcoming_by_tour.get("R", [])] +
+        [(t["tournamentName"], ts_to_date(t["startDate"]), t.get("city","") + " " + t.get("country",""), t.get("purse",""), "Korn Ferry Tour") for t in upcoming_by_tour.get("H", [])] +
+        [(t["tournamentName"], ts_to_date(t["startDate"]), t.get("city","") + " " + t.get("country",""), t.get("purse",""), "PGA Tour Americas") for t in upcoming_by_tour.get("Y", [])] +
+        [(e["name"], e["start_date"], e["location"], e["purse"], "LPGA Tour") for e in LPGA_SCHEDULE_2026] +
+        [(e["name"], e["start_date"], e["location"], e["purse"], "Asian Tour") for e in ASIAN_TOUR_SCHEDULE_2026]
+    )
     for event_name in exemptions:
+        # Try to find the event in known schedules
+        matched_date, matched_loc, matched_purse, matched_tour = "TBD", "", "", "Exempt Entry"
+        for known_name, known_date, known_loc, known_purse, known_tour in all_known_events:
+            if fuzz.token_sort_ratio(event_name.lower(), known_name.lower()) >= 75:
+                matched_date = known_date
+                matched_loc = known_loc
+                matched_purse = known_purse
+                matched_tour = known_tour
+                break
         possible.append({
             "name": event_name,
-            "date": "TBD",
-            "location": "",
-            "tour": "Exempt Entry",
-            "purse": "",
+            "date": matched_date,
+            "location": matched_loc.strip(),
+            "tour": matched_tour,
+            "purse": matched_purse,
             "status": "possible"
         })
 
@@ -480,41 +496,45 @@ with tab1:
                     st.markdown(f"Tour: {badge(tour)}", unsafe_allow_html=True)
                 with cb:
                     st.markdown(f'<div style="text-align:right"><div style="font-family:Bebas Neue,sans-serif;font-size:2rem;color:#006847">{len(upcoming)}</div><div style="font-size:0.7rem;color:#666;text-transform:uppercase">Upcoming</div></div>', unsafe_allow_html=True)
-                if upcoming:
+                # Merge possible events into upcoming display
+                possible_events = data.get("possible", [])
+                possible_filtered = [p for p in possible_events 
+                                    if p["date"] == "TBD" or today <= p["date"] <= cutoff]
+
+                # Combine confirmed + possible, sort by date
+                combined = []
+                for e in upcoming:
+                    combined.append({**e, "status": "confirmed"})
+                for p in possible_filtered:
+                    # Don't add if already in confirmed
+                    if not any(fuzz.token_sort_ratio(p["name"].lower(), e["name"].lower()) >= 80 
+                               for e in upcoming):
+                        combined.append({**p, "status": "possible"})
+                combined.sort(key=lambda x: x["date"] if x["date"] != "TBD" else "9999")
+
+                if combined:
+                    st.markdown("**Upcoming Events:**")
                     if tour == "LPGA Tour":
                         confirmed_for_player = lpga_confirmed.get(name, [])
-                        confirmed_events = [e for e in upcoming if any(
-                            fuzz.token_sort_ratio(e["name"].lower(), c.lower()) >= 80
-                            for c in confirmed_for_player
-                        )]
-                        possible_events = [e for e in upcoming if e not in confirmed_events]
-
-                        if confirmed_events:
-                            st.markdown("**✅ Confirmed Entries:**")
-                            for e in confirmed_events:
-                                st.markdown(f'<div class="event-card" style="border-left-color:#66bb6a"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span class="upcoming-pill">confirmed</span></p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])} &nbsp;|&nbsp; 💰 {e["purse"]}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
-
-                        if possible_events:
-                            st.markdown("**📅 Season Schedule** *(entry not confirmed)*")
+                        for e in combined:
+                            is_confirmed = any(fuzz.token_sort_ratio(e["name"].lower(), c.lower()) >= 80 for c in confirmed_for_player)
+                            if is_confirmed:
+                                st.markdown(f'<div class="event-card" style="border-left-color:#66bb6a"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span class="upcoming-pill">confirmed</span></p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])} &nbsp;|&nbsp; 💰 {e.get("purse","")}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
+                            else:
+                                st.markdown(f'<div class="event-card" style="border-left-color:#f48fb1"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span style="background:#2a1a2e;color:#f48fb1;border:1px solid #f48fb1;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px">possible</span></p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])} &nbsp;|&nbsp; 💰 {e.get("purse","")}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
+                        if not combined:
                             st.caption("⚠️ LPGA fields post Tuesday of event week.")
-                            for e in possible_events:
-                                st.markdown(f'<div class="event-card" style="border-left-color:#f48fb1"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span style="background:#2a1a2e;color:#f48fb1;border:1px solid #f48fb1;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px">possible</span></p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])} &nbsp;|&nbsp; 💰 {e["purse"]}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
                     else:
                         st.markdown("**Upcoming Events:**")
-                        for e in upcoming:
-                            st.markdown(f'<div class="event-card"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span class="upcoming-pill">upcoming</span></p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
+                        for e in combined:
+                            if e.get("status") == "possible":
+                                st.markdown(f'<div class="event-card" style="border-left-color:#ffa726;opacity:0.85"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span style="background:#2e2a1a;color:#ffa726;border:1px solid #ffa726;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px">possible</span></p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])}</p></div><div class="event-date" style="color:#ffa726">{e["date"]}</div></div></div>', unsafe_allow_html=True)
+                            else:
+                                st.markdown(f'<div class="event-card"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span class="upcoming-pill">upcoming</span></p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
                 else:
-                    st.markdown("*No confirmed events found in selected time range.*")
+                    st.markdown("*No events found in selected time range.*")
 
-                # Show possible events
-                possible = [p for p in data.get("possible", [])
-                           if p["date"] == "TBD" or today <= p["date"] <= cutoff]
-                if possible:
-                    st.markdown("**📅 Possible Upcoming Events:**")
-                    st.caption("Based on tour membership — confirms automatically when field posts Tuesday")
-                    for p in possible:
-                        date_str = p["date"] if p["date"] != "TBD" else "Date TBD"
-                        st.markdown(f'<div class="event-card" style="border-left-color:#ffa726;opacity:0.85"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{p["name"]} <span style="background:#2e2a1a;color:#ffa726;border:1px solid #ffa726;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px">possible</span></p><p class="event-meta">📍 {p["location"]} &nbsp;|&nbsp; {badge(p["tour"])}</p></div><div class="event-date" style="color:#ffa726">{date_str}</div></div></div>', unsafe_allow_html=True)
+
                 if past:
                     with st.expander(f"Past events ({len(past)})"):
                         for e in past[-5:]:
