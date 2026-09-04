@@ -248,6 +248,9 @@ def build_athlete_data(mexican_golfers):
                 # Carlos Ortiz only plays International Series, not all Asian Tour events
                 if name == "Carlos Ortiz" and e["series"] != "International Series":
                     continue
+                # Santiago skips Hong Kong Open — conflicts with Mexico Open
+                if name == "Santiago de La Fuente" and e["name"] == "Link Hong Kong Open":
+                    continue
                 athletes[name]["events"].append({
                     "name": e["name"],
                     "date": e["start_date"],
@@ -329,7 +332,10 @@ with st.sidebar:
         st.cache_data.clear()
         st.rerun()
     st.markdown("---")
-    st.caption("PGA Tour · Korn Ferry · PGA Tour Americas: live\nLIV Golf: 2026 hardcoded · Refreshes every 30min")
+    st.caption("PGA Tour · Korn Ferry · PGA Tour Americas: live\nLIV Golf · LPGA · Asian Tour: 2026 hardcoded\nRefreshes every 30min")
+    st.markdown("---")
+    st.markdown("**🇲🇽 Mexico Events**")
+    st.info("VidantaWorld Mexico Open\nOct 28 — Field posts Tuesday Oct 20\n\nExpect: Santiago de La Fuente, Álvaro Ortiz, Omar Morales")
 
 st.markdown("""<div class="hero"><h1>MEXICAN ATHLETE TRACKER</h1>
 <p>Professional golf — worldwide competitions — live data</p>
