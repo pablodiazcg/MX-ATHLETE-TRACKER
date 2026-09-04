@@ -124,6 +124,20 @@ ASIAN_TOUR_MEXICAN_PLAYERS = [
     "Carlos Ortiz",  # plays International Series events alongside LIV
 ]
 
+
+# Tour membership — determines which events show as "possible"
+TOUR_MEMBERSHIP = {
+    "Álvaro Ortiz":           "H",   # Korn Ferry
+    "Omar Morales":           "Y",   # PGA Tour Americas
+    "Raul Pereda":            "Y",   # PGA Tour Americas
+    "Emilio Gonzalez":        "R",   # PGA Tour
+    "Rodolfo Cazaubon":       "Y",   # PGA Tour Americas
+    "Jose Cristobal Islas":   "Y",   # PGA Tour Americas
+    "Luis Carrera":           "Y",   # PGA Tour Americas
+    "Sebastian Vazquez":      "Y",   # PGA Tour Americas
+    "Julio Arronte":          "Y",   # PGA Tour Americas
+}
+
 LIV_ROSTER_2026 = [
     "Joaquin Niemann","Abraham Ancer","Sebastian Munoz","Carlos Ortiz",
     "Dustin Johnson","Thomas Detry","Thomas Pieters","Anthony Kim",
@@ -230,8 +244,47 @@ def fetch_event_and_search(t, targets, tour_name):
                 "tour":tour_name,"purse":t.get("purse","")})
     return results
 
-def build_athlete_data(mexican_golfers):
-    athletes = {name:{"events":[],"tour":"Unknown"} for name in mexican_golfers}
+
+def get_possible_events(name, upcoming_by_tour, manual_exemptions):
+    """Get events player could possibly enter based on tour membership + manual exemptions."""
+    possible = []
+
+    # Tour membership based possible events
+    tour_code = TOUR_MEMBERSHIP.get(name)
+    if tour_code and tour_code in upcoming_by_tour:
+        tour_names = {"R": "PGA Tour", "H": "Korn Ferry Tour", "Y": "PGA Tour Americas"}
+        for t in upcoming_by_tour[tour_code]:
+            possible.append({
+                "name": t["tournamentName"],
+                "date": ts_to_date(t["startDate"]),
+                "location": f"{t.get('city','')} {t.get('country','')}".strip(),
+                "tour": tour_names[tour_code],
+                "purse": t.get("purse", ""),
+                "status": "possible"
+            })
+
+    # Manual exemptions
+    exemptions = manual_exemptions.get(name, [])
+    for event_name in exemptions:
+        possible.append({
+            "name": event_name,
+            "date": "TBD",
+            "location": "",
+            "tour": "Exempt Entry",
+            "purse": "",
+            "status": "possible"
+        })
+
+    return possible
+
+def build_athlete_data(mexican_golfers, manual_exemptions={}):
+    athletes = {name:{"events":[],"tour":"Unknown","possible":[]} for name in mexican_golfers}
+
+    # Pre-fetch upcoming events for each tour for possible events
+    upcoming_by_tour = {}
+    for code in ["R", "H", "Y"]:
+        up, _ = fetch_pga_schedule(code)
+        upcoming_by_tour[code] = up
     for name in mexican_golfers:
         matched,score,_ = fuzzy_match(name, LIV_ROSTER_2026, threshold=85)
         if matched:
@@ -281,6 +334,15 @@ def build_athlete_data(mexican_golfers):
                     n = entry["athlete"]
                     if athletes[n]["tour"] == "Unknown": athletes[n]["tour"] = tour_name
                     athletes[n]["events"].append(entry)
+    # Add possible events for tour members and exempt entries
+    for name in mexican_golfers:
+        possible = get_possible_events(name, upcoming_by_tour, manual_exemptions)
+        # Only add as possible if not already confirmed in that event
+        confirmed_names = [e["name"].lower() for e in athletes[name]["events"]]
+        for p in possible:
+            if not any(fuzz.token_sort_ratio(p["name"].lower(), c) >= 80 for c in confirmed_names):
+                athletes[name]["possible"].append(p)
+
     return athletes
 
 with st.sidebar:
@@ -303,6 +365,27 @@ with st.sidebar:
     st.markdown("---")
     weeks_ahead = st.slider("📅 Weeks ahead", 1, 16, 8)
     st.markdown("---")
+    st.markdown("---")
+    st.markdown("**🎟️ Sponsor Exemptions / Special Entries**")
+    st.caption("For non-tour-members entering specific events. Format: Player | Tournament")
+    exemptions_input = st.text_area(
+        "Exemptions:",
+        value="",
+        height=80,
+        placeholder="Santiago de La Fuente | VidantaWorld Mexico Open",
+        label_visibility="collapsed"
+    )
+    MANUAL_EXEMPTIONS = {}
+    for line in exemptions_input.strip().split("\n"):
+        if "|" in line:
+            parts = line.split("|")
+            if len(parts) == 2:
+                player = parts[0].strip()
+                event = parts[1].strip()
+                if player not in MANUAL_EXEMPTIONS:
+                    MANUAL_EXEMPTIONS[player] = []
+                MANUAL_EXEMPTIONS[player].append(event)
+
     st.markdown("---")
     st.markdown("**🏌️ LPGA Confirmed Entries** *(update Tuesday of event week)*")
     st.caption("Format: Player Name | Tournament Name")
@@ -342,7 +425,7 @@ st.markdown("""<div class="hero"><h1>MEXICAN ATHLETE TRACKER</h1>
 <div class="updated">Last updated: """ + datetime.now().strftime('%B %d, %Y at %H:%M') + """</div></div>""", unsafe_allow_html=True)
 
 with st.spinner("Fetching live tournament data across all tours..."):
-    athlete_data = build_athlete_data(MEXICAN_GOLFERS)
+    athlete_data = build_athlete_data(MEXICAN_GOLFERS, MANUAL_EXEMPTIONS)
 
 today = datetime.now().strftime("%Y-%m-%d")
 cutoff = (datetime.now()+timedelta(weeks=weeks_ahead)).strftime("%Y-%m-%d")
@@ -411,7 +494,17 @@ with tab1:
                         for e in upcoming:
                             st.markdown(f'<div class="event-card"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span class="upcoming-pill">upcoming</span></p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
                 else:
-                    st.markdown("*No upcoming events in selected time range.*")
+                    st.markdown("*No confirmed events found in selected time range.*")
+
+                # Show possible events
+                possible = [p for p in data.get("possible", [])
+                           if p["date"] == "TBD" or today <= p["date"] <= cutoff]
+                if possible:
+                    st.markdown("**📅 Possible Upcoming Events:**")
+                    st.caption("Based on tour membership — confirms automatically when field posts Tuesday")
+                    for p in possible:
+                        date_str = p["date"] if p["date"] != "TBD" else "Date TBD"
+                        st.markdown(f'<div class="event-card" style="border-left-color:#ffa726;opacity:0.85"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{p["name"]} <span style="background:#2e2a1a;color:#ffa726;border:1px solid #ffa726;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px">possible</span></p><p class="event-meta">📍 {p["location"]} &nbsp;|&nbsp; {badge(p["tour"])}</p></div><div class="event-date" style="color:#ffa726">{date_str}</div></div></div>', unsafe_allow_html=True)
                 if past:
                     with st.expander(f"Past events ({len(past)})"):
                         for e in past[-5:]:
@@ -463,3 +556,4 @@ with tab3:
             pill = '<span class="upcoming-pill">upcoming</span>' if is_up else '<span class="past-pill">completed</span>'
             series_badge = '<span style="background:#1a2e2e;color:#80cbc4;border:1px solid #80cbc4;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px">Int\'l Series</span>' if e["series"] == "International Series" else '<span style="background:#1a1a1a;color:#aaa;border:1px solid #444;border-radius:20px;padding:2px 8px;font-size:0.65rem;letter-spacing:1px">Asian Tour</span>'
             st.markdown(f'<div class="event-card" style="opacity:{"1" if is_up else "0.4"}"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} &nbsp;{pill} &nbsp;{series_badge}</p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; 💰 {e["purse"]}</p></div><div class="event-date">{e["start_date"]}</div></div></div>', unsafe_allow_html=True)
+
