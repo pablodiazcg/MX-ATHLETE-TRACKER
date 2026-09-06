@@ -302,11 +302,11 @@ ATHLETE_DB = {
     "Santiago de La Fuente": {
         "full_name": "Santiago de La Fuente",
         "born": "June 14, 2000",
-        "birthplace": "Mexico City, Mexico",
+        "birthplace": "Ocotlán, Jalisco, Mexico",
         "age": 26,
         "height": "5'11\"",
         "turned_pro": 2022,
-        "college": "University of Florida",
+        "college": "University of Houston",
         "wins": 1,
         "current_ranking": 200,
         "best_ranking": 200,
@@ -319,7 +319,7 @@ ATHLETE_DB = {
             {"name": "Titleist", "category": "Equipment"},
         ],
         "social": {"instagram": "santiagodlf_golf"},
-        "bio": "Young Mexican professional playing the Asian Tour and International Series. One of Mexico's top emerging talents in men's professional golf.",
+        "bio": "Young Mexican professional from Ocotlán, Jalisco playing the Asian Tour and International Series. Attended University of Houston. One of Mexico's top emerging talents in men's professional golf.",
     },
     "Rodolfo Cazaubon": {
         "full_name": "Rodolfo Cazaubon",
@@ -342,11 +342,11 @@ ATHLETE_DB = {
     "Omar Morales": {
         "full_name": "Omar Morales",
         "born": "January 10, 1995",
-        "birthplace": "Mexico",
+        "birthplace": "Puebla, Mexico",
         "age": 31,
         "height": "5'11\"",
         "turned_pro": 2017,
-        "college": "N/A",
+        "college": "UCLA",
         "wins": 0,
         "best_ranking": 400,
         "highlights": [
@@ -355,7 +355,7 @@ ATHLETE_DB = {
         ],
         "sponsors": [],
         "social": {},
-        "bio": "Mexican professional competing regularly on PGA Tour Americas with strong results in 2026.",
+        "bio": "Mexican professional from Puebla who attended UCLA. Competing regularly on PGA Tour Americas with strong results in 2026.",
     },
     "Lauren Olivares": {
         "full_name": "Lauren Olivares",
