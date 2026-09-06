@@ -40,6 +40,16 @@ st.markdown("""
   #MainMenu, footer, header { visibility: hidden; }
   .upcoming-pill { background: #006847; color: white; border-radius: 20px; padding: 2px 8px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
   .past-pill { background: #222; color: #666; border-radius: 20px; padding: 2px 8px; font-size: 0.65rem; letter-spacing: 1px; }
+
+  .profile-section { background: #141414; border: 1px solid #222; border-radius: 12px; padding: 1.25rem; margin-top: 1rem; }
+  .profile-stat { display: inline-block; margin-right: 1.5rem; margin-bottom: 0.5rem; }
+  .profile-stat .stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: #f0f0f0; }
+  .profile-stat .stat-label { font-size: 0.65rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+  .sponsor-chip { display: inline-block; background: #1a1a1a; border: 1px solid #333; border-radius: 20px; padding: 4px 12px; margin: 3px; font-size: 0.75rem; color: #ccc; }
+  .sponsor-chip .cat { color: #666; font-size: 0.65rem; }
+  .highlight-item { padding: 4px 0; border-bottom: 1px solid #1a1a1a; font-size: 0.85rem; color: #ccc; }
+  .highlight-item:last-child { border-bottom: none; }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -136,6 +146,227 @@ TOUR_MEMBERSHIP = {
     "Luis Carrera":           "Y",   # PGA Tour Americas
     "Sebastian Vazquez":      "Y",   # PGA Tour Americas
     "Julio Arronte":          "Y",   # PGA Tour Americas
+}
+
+
+# ── Athlete Database ──────────────────────────────────────────────────────────
+# Personal info and sponsors — update manually as needed
+ATHLETE_DB = {
+    "Abraham Ancer": {
+        "full_name": "Abraham Ancer Sagastegui",
+        "born": "February 27, 1991",
+        "birthplace": "McAllen, Texas (raised in Reynosa, Mexico)",
+        "age": 35,
+        "height": "5'7\"",
+        "turned_pro": 2013,
+        "college": "University of Oklahoma",
+        "wins": 6,
+        "best_ranking": 11,
+        "highlights": [
+            "2021 WGC-FedEx St. Jude Invitational (PGA Tour win)",
+            "2018 Emirates Australian Open",
+            "2024 LIV Golf Hong Kong",
+            "2023 Pan American Games Gold Medal",
+            "2019 Presidents Cup International Team",
+        ],
+        "sponsors": [
+            {"name": "Miura Golf", "category": "Equipment"},
+            {"name": "Black Quail", "category": "Apparel"},
+            {"name": "Flecha Azul Tequila", "category": "Lifestyle (co-founder)"},
+        ],
+        "social": {"instagram": "abraham_ancer", "twitter": "Abraham_Ancer"},
+        "bio": "Mexican-American golfer born in McAllen, Texas and raised in Reynosa, Mexico. Co-founded Flecha Azul premium tequila brand. Lost his father in 2014, dedicating his career to his memory.",
+    },
+    "Carlos Ortiz": {
+        "full_name": "Carlos Ortiz Ruiz",
+        "born": "March 28, 1991",
+        "birthplace": "Guadalajara, Jalisco, Mexico",
+        "age": 35,
+        "height": "6'1\"",
+        "turned_pro": 2012,
+        "college": "University of North Texas",
+        "wins": 4,
+        "best_ranking": 51,
+        "highlights": [
+            "2020 Houston Open (PGA Tour win)",
+            "2025 International Series Macau",
+            "2020 Tokyo Olympics Bronze Medal",
+            "LIV Golf Torque GC team member",
+        ],
+        "sponsors": [
+            {"name": "Callaway", "category": "Equipment"},
+            {"name": "Adidas Golf", "category": "Apparel"},
+        ],
+        "social": {"instagram": "carlosortizgolf", "twitter": "CarlosOrtizGolf"},
+        "bio": "Professional golfer from Guadalajara who won Mexico's first PGA Tour title in 16 years at the 2020 Houston Open. Won Olympic bronze at Tokyo 2020.",
+    },
+    "Álvaro Ortiz": {
+        "full_name": "Álvaro Ortiz Ruiz",
+        "born": "October 3, 1994",
+        "birthplace": "Guadalajara, Jalisco, Mexico",
+        "age": 31,
+        "height": "6'0\"",
+        "turned_pro": 2017,
+        "college": "University of Arkansas",
+        "wins": 2,
+        "best_ranking": 180,
+        "highlights": [
+            "2026 UNC Health Championship (Korn Ferry)",
+            "Brother of Carlos Ortiz",
+            "Multiple Korn Ferry top-10 finishes in 2026",
+        ],
+        "sponsors": [
+            {"name": "Titleist", "category": "Equipment"},
+        ],
+        "social": {"instagram": "alvaroortizgolf"},
+        "bio": "Younger brother of Carlos Ortiz, also a professional golfer. Playing on the Korn Ferry Tour with an impressive 2026 season including his first professional win.",
+    },
+    "Gaby Lopez": {
+        "full_name": "Maria Gabriela López Butron",
+        "born": "November 9, 1993",
+        "birthplace": "Mexico City, Mexico",
+        "age": 32,
+        "height": "5'6\"",
+        "turned_pro": 2015,
+        "college": "University of Arkansas",
+        "wins": 3,
+        "best_ranking": 36,
+        "highlights": [
+            "2022 Dana Open (LPGA win)",
+            "2020 Diamond Resorts Tournament of Champions",
+            "2018 Blue Bay LPGA",
+            "T2 at 2026 US Women's Open",
+            "Mexico flag bearer at Tokyo 2020 Olympics",
+            "Three-time Olympian (Rio, Tokyo, Paris)",
+        ],
+        "sponsors": [
+            {"name": "Titleist", "category": "Equipment"},
+            {"name": "Telcel", "category": "Telecom"},
+            {"name": "AeroMexico", "category": "Aviation"},
+            {"name": "Punta Mita", "category": "Resort"},
+            {"name": "Ponyflo", "category": "Apparel (founder)"},
+        ],
+        "social": {"instagram": "gabylopezgolf", "twitter": "GabyLopezGolf"},
+        "bio": "Mexico City native and three-time LPGA winner. Carried Mexico's flag at the Tokyo Olympics. Founder of Ponyflo, a women's cap brand. Considered the successor to Lorena Ochoa's legacy in Mexican golf.",
+    },
+    "Maria Fassi": {
+        "full_name": "Maria Fassi",
+        "born": "November 22, 1997",
+        "birthplace": "Mexico City, Mexico",
+        "age": 28,
+        "height": "5'9\"",
+        "turned_pro": 2019,
+        "college": "University of Arkansas",
+        "wins": 0,
+        "best_ranking": 77,
+        "highlights": [
+            "2019 Augusta National Women's Amateur champion",
+            "2019 LPGA Tour Rookie of the Year",
+            "2020 Tokyo Olympics representative",
+            "Known for exceptional power off the tee",
+        ],
+        "sponsors": [
+            {"name": "Titleist", "category": "Equipment"},
+            {"name": "FootJoy", "category": "Footwear"},
+        ],
+        "social": {"instagram": "mariafassi_golf"},
+        "bio": "Power hitter from Mexico City who won the inaugural Augusta National Women's Amateur in 2019. Won LPGA Rookie of the Year that same season.",
+    },
+    "Isabella Fierro": {
+        "full_name": "Isabella Fierro",
+        "born": "November 1, 2001",
+        "birthplace": "Monterrey, Mexico",
+        "age": 24,
+        "height": "5'7\"",
+        "turned_pro": 2023,
+        "college": "University of Arizona",
+        "wins": 0,
+        "best_ranking": 120,
+        "highlights": [
+            "2022 NCAA Individual Championship",
+            "LPGA Tour member since 2024",
+        ],
+        "sponsors": [
+            {"name": "Titleist", "category": "Equipment"},
+        ],
+        "social": {"instagram": "isabellafierrogolf"},
+        "bio": "Young Mexican professional from Monterrey, NCAA champion who transitioned to the LPGA Tour. One of Mexico's brightest young talents in women's golf.",
+    },
+    "Santiago de La Fuente": {
+        "full_name": "Santiago de La Fuente",
+        "born": "June 14, 2000",
+        "birthplace": "Mexico City, Mexico",
+        "age": 26,
+        "height": "5'11\"",
+        "turned_pro": 2022,
+        "college": "University of Florida",
+        "wins": 1,
+        "best_ranking": 200,
+        "highlights": [
+            "2024 PGA Tour Americas win",
+            "Asian Tour / International Series regular",
+            "NCAA standout at University of Florida",
+        ],
+        "sponsors": [
+            {"name": "Titleist", "category": "Equipment"},
+        ],
+        "social": {"instagram": "santiagodlf_golf"},
+        "bio": "Young Mexican professional playing the Asian Tour and International Series. One of Mexico's top emerging talents in men's professional golf.",
+    },
+    "Rodolfo Cazaubon": {
+        "full_name": "Rodolfo Cazaubon",
+        "born": "August 15, 1996",
+        "birthplace": "Mexico City, Mexico",
+        "age": 29,
+        "height": "5'10\"",
+        "turned_pro": 2019,
+        "college": "University of Houston",
+        "wins": 0,
+        "best_ranking": 350,
+        "highlights": [
+            "PGA Tour Americas competitor",
+            "Multiple professional wins in Mexico",
+        ],
+        "sponsors": [],
+        "social": {"instagram": "rcazaubon"},
+        "bio": "Mexican professional competing on PGA Tour Americas and developmental tours.",
+    },
+    "Omar Morales": {
+        "full_name": "Omar Morales",
+        "born": "January 10, 1995",
+        "birthplace": "Mexico",
+        "age": 31,
+        "height": "5'11\"",
+        "turned_pro": 2017,
+        "college": "N/A",
+        "wins": 0,
+        "best_ranking": 400,
+        "highlights": [
+            "Active PGA Tour Americas competitor 2026",
+            "Multiple top-10 finishes in 2026",
+        ],
+        "sponsors": [],
+        "social": {},
+        "bio": "Mexican professional competing regularly on PGA Tour Americas with strong results in 2026.",
+    },
+    "Lauren Olivares": {
+        "full_name": "Lauren Olivares",
+        "born": "2000",
+        "birthplace": "Mexico",
+        "age": 25,
+        "height": "5'6\"",
+        "turned_pro": 2022,
+        "college": "N/A",
+        "wins": 0,
+        "best_ranking": 200,
+        "highlights": [
+            "Epson Tour competitor",
+            "Earned 2027 LPGA Tour card",
+        ],
+        "sponsors": [],
+        "social": {},
+        "bio": "Young Mexican professional who earned her 2027 LPGA Tour card after competing on the Epson Tour.",
+    },
 }
 
 LIV_ROSTER_2026 = [
@@ -494,6 +725,73 @@ with tab1:
                 with ca:
                     st.markdown(f"**{name}**")
                     st.markdown(f"Tour: {badge(tour)}", unsafe_allow_html=True)
+
+                    # Personal info from database
+                    db = ATHLETE_DB.get(name, {})
+                    if db:
+                        st.markdown(f"""
+                        <div class="profile-section">
+                          <div style="margin-bottom:0.75rem">
+                            <span class="profile-stat"><div class="stat-val">{db.get("age","—")}</div><div class="stat-label">Age</div></span>
+                            <span class="profile-stat"><div class="stat-val">{db.get("turned_pro","—")}</div><div class="stat-label">Turned Pro</div></span>
+                            <span class="profile-stat"><div class="stat-val">{db.get("wins","—")}</div><div class="stat-label">Pro Wins</div></span>
+                            <span class="profile-stat"><div class="stat-val">#{db.get("best_ranking","—")}</div><div class="stat-label">Best Ranking</div></span>
+                          </div>
+                          <div style="font-size:0.8rem;color:#888;margin-bottom:0.5rem">📍 {db.get("birthplace","—")} &nbsp;|&nbsp; 🎓 {db.get("college","—")}</div>
+                          <div style="font-size:0.82rem;color:#bbb;line-height:1.5">{db.get("bio","")}</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                        # Sponsors
+                        sponsors = db.get("sponsors", [])
+                        if sponsors:
+                            st.markdown("**🤝 Current Sponsors:**")
+                            sponsor_html = " ".join([f'<span class="sponsor-chip">{s["name"]} <span class="cat">· {s["category"]}</span></span>' for s in sponsors])
+                            st.markdown(sponsor_html, unsafe_allow_html=True)
+                        else:
+                            st.markdown("**🤝 Sponsors:** *No sponsors on file — [contact us to add]*")
+
+                        # Career highlights
+                        highlights = db.get("highlights", [])
+                        if highlights:
+                            with st.expander("🏆 Career Highlights"):
+                                for h in highlights:
+                                    st.markdown(f'<div class="highlight-item">⭐ {h}</div>', unsafe_allow_html=True)
+
+                        # News popup button
+                        if st.button(f"📰 Latest News — {name.split()[0]}", key=f"news_{name}"):
+                            st.session_state[f"show_news_{name}"] = True
+
+                        # News popup
+                        if st.session_state.get(f"show_news_{name}"):
+                            with st.container():
+                                st.markdown(f"---\n**📰 Recent News: {name}**")
+                                with st.spinner("Searching for latest news..."):
+                                    try:
+                                        r = requests.get(
+                                            f"https://news.google.com/rss/search?q={name.replace(' ','+')}+golf&hl=en-US&gl=US&ceid=US:en",
+                                            headers=HEADERS, timeout=10
+                                        )
+                                        if r.status_code == 200:
+                                            from xml.etree import ElementTree as ET
+                                            root = ET.fromstring(r.content)
+                                            items = root.findall(".//item")[:5]
+                                            if items:
+                                                for item in items:
+                                                    title = item.find("title").text if item.find("title") is not None else ""
+                                                    link = item.find("link").text if item.find("link") is not None else ""
+                                                    pub = item.find("pubDate").text if item.find("pubDate") is not None else ""
+                                                    if title:
+                                                        st.markdown(f"• [{title}]({link}) *{pub[:16]}*")
+                                            else:
+                                                st.info("No recent news found.")
+                                        else:
+                                            st.info("Could not fetch news right now.")
+                                    except Exception as e:
+                                        st.info("News search unavailable.")
+                                if st.button("Close", key=f"close_news_{name}"):
+                                    st.session_state[f"show_news_{name}"] = False
+                                    st.rerun()
                 with cb:
                     st.markdown(f'<div style="text-align:right"><div style="font-family:Bebas Neue,sans-serif;font-size:2rem;color:#006847">{len(upcoming)}</div><div style="font-size:0.7rem;color:#666;text-transform:uppercase">Upcoming</div></div>', unsafe_allow_html=True)
                 # Merge possible events into upcoming display
