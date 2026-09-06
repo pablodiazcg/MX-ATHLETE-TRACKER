@@ -661,6 +661,7 @@ def get_results_for_athlete(name):
         wins = info.get("wins", 0)
         top10 = info.get("top10", 0)
         tid = ov.get("tournamentId", "")
+        tname = ov.get("tournamentName", "")
 
         # Get position from leaderboard if made cut
         position, score = None, None
@@ -669,7 +670,8 @@ def get_results_for_athlete(name):
 
         results.append({
             "tournament_id": tid,
-            "name": ov.get("tournamentName", ""),
+            "name": tname,
+            "name_lower": tname.lower(),
             "location": ov.get("courseCity", ""),
             "cut_missed": cut_missed,
             "earnings": earnings,
@@ -1061,11 +1063,24 @@ with tab1:
                     with st.expander(f"Past events ({len(past)})"):
                         # Get results data if available
                         results_data = get_results_for_athlete(name)
-                        results_by_name = {r["name"].lower(): r for r in results_data}
+                        # Build results lookup with fuzzy matching
+                        def find_result(event_name, results_list):
+                            if not results_list:
+                                return None
+                            best_score = 0
+                            best_result = None
+                            for r in results_list:
+                                score = fuzz.token_sort_ratio(
+                                    strip_accents(event_name.lower()),
+                                    strip_accents(r["name"].lower())
+                                )
+                                if score > best_score:
+                                    best_score = score
+                                    best_result = r
+                            return best_result if best_score >= 70 else None
 
                         for e in past[-10:]:
-                            # Look up result for this event
-                            result = results_by_name.get(e["name"].lower())
+                            result = find_result(e["name"], results_data)
 
                             if result:
                                 pos = result["position"]
