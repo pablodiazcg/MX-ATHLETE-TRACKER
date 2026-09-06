@@ -61,6 +61,9 @@ DEFAULT_MEXICAN_GOLFERS = [
     "Emilio Gonzalez","Raul Pereda","Jose Cristobal Islas","Omar Morales",
     "Luis Carrera","Sebastian Vazquez","Julio Arronte","Yael Chahin",
     "Gaby Lopez","Isabella Fierro","Lauren Olivares","Maria Fassi",
+    "Marcelo Garza",
+    "Jose Cristobal Islas",
+    "José de Jesús Rodríguez",
 ]
 
 
@@ -146,6 +149,8 @@ TOUR_MEMBERSHIP = {
     "Luis Carrera":           "Y",   # PGA Tour Americas
     "Sebastian Vazquez":      "Y",   # PGA Tour Americas
     "Julio Arronte":          "Y",   # PGA Tour Americas
+    "Marcelo Garza":          "Y",   # PGA Tour Americas
+    "Jose Cristobal Islas":   "Y",   # PGA Tour Americas
 }
 
 
@@ -357,6 +362,71 @@ ATHLETE_DB = {
         "social": {},
         "bio": "Mexican professional from Puebla who attended UCLA. Competing regularly on PGA Tour Americas with strong results in 2026.",
     },
+        "Marcelo Garza": {
+        "full_name": "Marcelo Garza",
+        "born": "2003",
+        "birthplace": "Mexico",
+        "age": 22,
+        "height": "—",
+        "turned_pro": 2024,
+        "college": "N/A",
+        "wins": 0,
+        "current_ranking": 112,
+        "best_ranking": 112,
+        "highlights": [
+            "Turned professional August 2024",
+            "One of Mexico\'s youngest active professionals",
+            "Active PGA Tour Americas competitor 2026",
+        ],
+        "sponsors": [],
+        "social": {},
+        "bio": "Young Mexican professional and one of the newest additions to PGA Tour Americas. Turned professional in August 2024 at age 22.",
+    },
+    "Jose Cristobal Islas": {
+        "full_name": "José Cristóbal Islas",
+        "born": "2002",
+        "birthplace": "Pachuca, Hidalgo, Mexico",
+        "age": 23,
+        "height": "—",
+        "turned_pro": 2024,
+        "college": "University of Oregon",
+        "wins": 0,
+        "current_ranking": 400,
+        "best_ranking": 400,
+        "highlights": [
+            "From Pachuca, Hidalgo, Mexico",
+            "University of Oregon standout",
+            "Active PGA Tour Americas competitor",
+        ],
+        "sponsors": [],
+        "social": {},
+        "bio": "Young Mexican professional from Pachuca, Hidalgo. Attended University of Oregon before turning professional. Competing on PGA Tour Americas.",
+    },
+    "José de Jesús Rodríguez": {
+        "full_name": "José de Jesús Rodríguez Martínez",
+        "born": "January 22, 1981",
+        "birthplace": "Irapuato, Guanajuato, Mexico",
+        "age": 45,
+        "height": "5\'10\"",
+        "turned_pro": 2007,
+        "college": "N/A",
+        "wins": 38,
+        "current_ranking": 500,
+        "best_ranking": 250,
+        "highlights": [
+            "38 professional wins across multiple tours",
+            "2017 PGA Tour Latinoamérica Order of Merit winner",
+            "2019-20 & 2023-24 Gira Profesional Mexicana Order of Merit winner",
+            "2011 Canadian Tour Order of Merit winner",
+            "Central American Games Silver Medal 2014 & 2023",
+            "Nicknamed \'Camarón\' (Shrimp)",
+            "Grew up in poverty in Irapuato — inspirational story",
+        ],
+        "sponsors": [],
+        "social": {},
+        "bio": "One of Mexico\'s most decorated professional golfers with 38 wins. Grew up in poverty in Irapuato, sleeping on a dirt floor with six siblings. Nicknamed \'Camarón\' (Shrimp). Multiple tour Order of Merit winner and a true Mexican golf legend.",
+    },
+
     "Lauren Olivares": {
         "full_name": "Lauren Olivares",
         "born": "2000",
@@ -375,6 +445,33 @@ ATHLETE_DB = {
         "social": {},
         "bio": "Young Mexican professional who earned her 2027 LPGA Tour card after competing on the Epson Tour.",
     },
+}
+
+
+# Player IDs for results lookup
+PLAYER_IDS = {
+    "Omar Morales":             "64690",
+    "Emilio Gonzalez":          "59567",
+    "Rodolfo Cazaubon":         "45702",
+    "Sebastian Vazquez":        "35469",
+    "Carlos Ortiz":             "33667",
+    "Abraham Ancer":            "45526",
+    "Marcelo Garza":            "65558",
+    "Jose Cristobal Islas":     "66282",
+    "José de Jesús Rodríguez":  "32058",
+}
+
+# Tour code for results lookup per player
+PLAYER_TOUR_CODE = {
+    "Omar Morales":             "Y",
+    "Emilio Gonzalez":          "R",
+    "Rodolfo Cazaubon":         "H",
+    "Sebastian Vazquez":        "H",
+    "Carlos Ortiz":             "R",
+    "Abraham Ancer":            "R",
+    "Marcelo Garza":            "Y",
+    "Jose Cristobal Islas":     "Y",
+    "José de Jesús Rodríguez":  "Y",
 }
 
 LIV_ROSTER_2026 = [
@@ -483,6 +580,106 @@ def fetch_event_and_search(t, targets, tour_name):
                 "tour":tour_name,"purse":t.get("purse","")})
     return results
 
+
+
+@st.cache_data(ttl=3600)
+def fetch_player_results(player_id, tour_code):
+    """Fetch all tournament results for a player including earnings."""
+    query = f"""
+    {{
+      playerProfileTournamentResults(playerId: "{player_id}", tourCode: {tour_code}) {{
+        tournaments {{
+          tournamentOverview {{
+            tournamentId
+            tournamentName
+            courseCity
+            courseCountry
+          }}
+          overviewInfo {{
+            wins
+            top10
+            cutsMade
+            cutsMissed
+            money
+          }}
+        }}
+      }}
+    }}
+    """
+    try:
+        r = requests.post("https://orchestrator.pgatour.com/graphql",
+                          headers=PGA_HEADERS, json={"query": query}, timeout=15)
+        return r.json()["data"]["playerProfileTournamentResults"]["tournaments"]
+    except:
+        return []
+
+@st.cache_data(ttl=3600)
+def fetch_finish_position(tournament_id, player_id):
+    """Get finish position from leaderboard for a specific player."""
+    query = f"""
+    {{
+      leaderboardV2(id: "{tournament_id}") {{
+        players {{
+          ... on PlayerRowV2 {{
+            position
+            score
+            total
+            player {{ id }}
+          }}
+        }}
+      }}
+    }}
+    """
+    try:
+        r = requests.post("https://orchestrator.pgatour.com/graphql",
+                          headers=PGA_HEADERS, json={"query": query}, timeout=15)
+        players = r.json()["data"]["leaderboardV2"]["players"]
+        for p in players:
+            if p.get("player") and p["player"].get("id") == player_id:
+                return p.get("position", "—"), p.get("score", "—")
+    except:
+        pass
+    return None, None
+
+def get_results_for_athlete(name):
+    """Get full results history for an athlete if we have their ID."""
+    player_id = PLAYER_IDS.get(name)
+    tour_code = PLAYER_TOUR_CODE.get(name)
+    if not player_id or not tour_code:
+        return []
+
+    tournaments = fetch_player_results(player_id, tour_code)
+    results = []
+    for t in tournaments:
+        ov = t.get("tournamentOverview")
+        info = t.get("overviewInfo")
+        if not ov or not info:
+            continue
+
+        cut_missed = info.get("cutsMissed", 0) > 0
+        earnings = info.get("money", 0)
+        wins = info.get("wins", 0)
+        top10 = info.get("top10", 0)
+        tid = ov.get("tournamentId", "")
+
+        # Get position from leaderboard if made cut
+        position, score = None, None
+        if not cut_missed and tid:
+            position, score = fetch_finish_position(tid, player_id)
+
+        results.append({
+            "tournament_id": tid,
+            "name": ov.get("tournamentName", ""),
+            "location": ov.get("courseCity", ""),
+            "cut_missed": cut_missed,
+            "earnings": earnings,
+            "wins": wins,
+            "top10": top10,
+            "position": position or ("CUT" if cut_missed else "—"),
+            "score": score or "—",
+        })
+
+    return results
 
 def get_possible_events(name, upcoming_by_tour, manual_exemptions):
     """Get events player could possibly enter based on tour membership + manual exemptions."""
@@ -862,8 +1059,35 @@ with tab1:
 
                 if past:
                     with st.expander(f"Past events ({len(past)})"):
-                        for e in past[-5:]:
-                            st.markdown(f'<div class="event-card" style="opacity:0.5"><div style="display:flex;justify-content:space-between"><div><p class="event-name">{e["name"]}</p><p class="event-meta">📍 {e["location"]}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
+                        # Get results data if available
+                        results_data = get_results_for_athlete(name)
+                        results_by_name = {r["name"].lower(): r for r in results_data}
+
+                        for e in past[-10:]:
+                            # Look up result for this event
+                            result = results_by_name.get(e["name"].lower())
+
+                            if result:
+                                pos = result["position"]
+                                earnings = f"💰 ${result['earnings']:,}" if result["earnings"] else ""
+                                score = f"({result['score']})" if result["score"] and result["score"] != "—" else ""
+
+                                if pos == "CUT":
+                                    pos_badge = '<span style="background:#2a1a1a;color:#ef5350;border:1px solid #ef5350;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600">✂️ CUT</span>'
+                                    pos_color = "#ef5350"
+                                elif result["wins"]:
+                                    pos_badge = '<span style="background:#1a2a1a;color:#66bb6a;border:1px solid #66bb6a;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600">🏆 WIN</span>'
+                                    pos_color = "#66bb6a"
+                                elif result["top10"]:
+                                    pos_badge = f'<span style="background:#1a2e1a;color:#66bb6a;border:1px solid #66bb6a;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600">{pos} {score}</span>'
+                                    pos_color = "#66bb6a"
+                                else:
+                                    pos_badge = f'<span style="background:#1a1a1a;color:#aaa;border:1px solid #444;border-radius:20px;padding:2px 8px;font-size:0.65rem">{pos} {score}</span>'
+                                    pos_color = "#666"
+
+                                st.markdown(f'<div class="event-card" style="opacity:0.8;border-left-color:{pos_color}"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} &nbsp;{pos_badge}</p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])} &nbsp;{earnings}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
+                            else:
+                                st.markdown(f'<div class="event-card" style="opacity:0.5"><div style="display:flex;justify-content:space-between"><div><p class="event-name">{e["name"]}</p><p class="event-meta">📍 {e["location"]}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
 
 with tab2:
     all_upcoming = []
