@@ -161,6 +161,7 @@ ATHLETE_DB = {
         "turned_pro": 2013,
         "college": "University of Oklahoma",
         "wins": 6,
+        "current_ranking": 197,
         "best_ranking": 11,
         "highlights": [
             "2021 WGC-FedEx St. Jude Invitational (PGA Tour win)",
@@ -178,19 +179,21 @@ ATHLETE_DB = {
         "bio": "Mexican-American golfer born in McAllen, Texas and raised in Reynosa, Mexico. Co-founded Flecha Azul premium tequila brand. Lost his father in 2014, dedicating his career to his memory.",
     },
     "Carlos Ortiz": {
-        "full_name": "Carlos Ortiz Ruiz",
-        "born": "March 28, 1991",
+        "full_name": "Carlos Ortiz Becerra",
+        "born": "April 24, 1991",
         "birthplace": "Guadalajara, Jalisco, Mexico",
         "age": 35,
         "height": "6'1\"",
         "turned_pro": 2012,
         "college": "University of North Texas",
-        "wins": 4,
-        "best_ranking": 51,
+        "wins": 10,
+        "current_ranking": 161,
+        "best_ranking": 44,
         "highlights": [
             "2020 Houston Open (PGA Tour win)",
             "2025 International Series Macau",
-            "2020 Tokyo Olympics Bronze Medal",
+            "T4 at 2025 US Open",
+            "2014 Web.com Tour Player of the Year",
             "LIV Golf Torque GC team member",
         ],
         "sponsors": [
@@ -198,7 +201,7 @@ ATHLETE_DB = {
             {"name": "Adidas Golf", "category": "Apparel"},
         ],
         "social": {"instagram": "carlosortizgolf", "twitter": "CarlosOrtizGolf"},
-        "bio": "Professional golfer from Guadalajara who won Mexico's first PGA Tour title in 16 years at the 2020 Houston Open. Won Olympic bronze at Tokyo 2020.",
+        "bio": "Professional golfer from Guadalajara with 10 professional wins. Won Mexico's first PGA Tour title in 16 years at the 2020 Houston Open. Finished T4 at the 2025 US Open. Now competing on LIV Golf.",
     },
     "Álvaro Ortiz": {
         "full_name": "Álvaro Ortiz Ruiz",
@@ -209,6 +212,7 @@ ATHLETE_DB = {
         "turned_pro": 2017,
         "college": "University of Arkansas",
         "wins": 2,
+        "current_ranking": 180,
         "best_ranking": 180,
         "highlights": [
             "2026 UNC Health Championship (Korn Ferry)",
@@ -230,6 +234,7 @@ ATHLETE_DB = {
         "turned_pro": 2015,
         "college": "University of Arkansas",
         "wins": 3,
+        "current_ranking": 36,
         "best_ranking": 36,
         "highlights": [
             "2022 Dana Open (LPGA win)",
@@ -258,6 +263,7 @@ ATHLETE_DB = {
         "turned_pro": 2019,
         "college": "University of Arkansas",
         "wins": 0,
+        "current_ranking": 77,
         "best_ranking": 77,
         "highlights": [
             "2019 Augusta National Women's Amateur champion",
@@ -281,6 +287,7 @@ ATHLETE_DB = {
         "turned_pro": 2023,
         "college": "University of Arizona",
         "wins": 0,
+        "current_ranking": 120,
         "best_ranking": 120,
         "highlights": [
             "2022 NCAA Individual Championship",
@@ -301,6 +308,7 @@ ATHLETE_DB = {
         "turned_pro": 2022,
         "college": "University of Florida",
         "wins": 1,
+        "current_ranking": 200,
         "best_ranking": 200,
         "highlights": [
             "2024 PGA Tour Americas win",
@@ -735,7 +743,8 @@ with tab1:
                             <span class="profile-stat"><div class="stat-val">{db.get("age","—")}</div><div class="stat-label">Age</div></span>
                             <span class="profile-stat"><div class="stat-val">{db.get("turned_pro","—")}</div><div class="stat-label">Turned Pro</div></span>
                             <span class="profile-stat"><div class="stat-val">{db.get("wins","—")}</div><div class="stat-label">Pro Wins</div></span>
-                            <span class="profile-stat"><div class="stat-val">#{db.get("best_ranking","—")}</div><div class="stat-label">Best Ranking</div></span>
+                            <span class="profile-stat"><div class="stat-val">#{db.get("current_ranking","—")}</div><div class="stat-label">Current Rank</div></span>
+                            <span class="profile-stat"><div class="stat-val">#{db.get("best_ranking","—")}</div><div class="stat-label">Best Rank</div></span>
                           </div>
                           <div style="font-size:0.8rem;color:#888;margin-bottom:0.5rem">📍 {db.get("birthplace","—")} &nbsp;|&nbsp; 🎓 {db.get("college","—")}</div>
                           <div style="font-size:0.82rem;color:#bbb;line-height:1.5">{db.get("bio","")}</div>
@@ -768,27 +777,45 @@ with tab1:
                                 st.markdown(f"---\n**📰 Recent News: {name}**")
                                 with st.spinner("Searching for latest news..."):
                                     try:
-                                        r = requests.get(
-                                            f"https://news.google.com/rss/search?q={name.replace(' ','+')}+golf&hl=en-US&gl=US&ceid=US:en",
-                                            headers=HEADERS, timeout=10
-                                        )
-                                        if r.status_code == 200:
-                                            from xml.etree import ElementTree as ET
-                                            root = ET.fromstring(r.content)
-                                            items = root.findall(".//item")[:5]
-                                            if items:
-                                                for item in items:
-                                                    title = item.find("title").text if item.find("title") is not None else ""
-                                                    link = item.find("link").text if item.find("link") is not None else ""
-                                                    pub = item.find("pubDate").text if item.find("pubDate") is not None else ""
-                                                    if title:
-                                                        st.markdown(f"• [{title}]({link}) *{pub[:16]}*")
-                                            else:
-                                                st.info("No recent news found.")
-                                        else:
-                                            st.info("Could not fetch news right now.")
+                                        from xml.etree import ElementTree as ET
+                                        news_found = False
+                                        rss_urls = [
+                                            "https://www.pgatour.com/rss/news.xml",
+                                            "https://www.golfchannel.com/rss/feed",
+                                        ]
+                                        for rss_url in rss_urls:
+                                            try:
+                                                r = requests.get(rss_url, headers=HEADERS, timeout=8)
+                                                if r.status_code == 200:
+                                                    root = ET.fromstring(r.content)
+                                                    items = root.findall(".//item")
+                                                    first = name.split()[0].lower()
+                                                    last = name.split()[-1].lower()
+                                                    relevant = []
+                                                    for item in items:
+                                                        t = item.find("title")
+                                                        txt = t.text if t is not None else ""
+                                                        if first in txt.lower() or last in txt.lower():
+                                                            l = item.find("link")
+                                                            p = item.find("pubDate")
+                                                            relevant.append({
+                                                                "title": txt,
+                                                                "link": l.text if l is not None else "#",
+                                                                "date": p.text[:16] if p is not None else ""
+                                                            })
+                                                    if relevant:
+                                                        for n in relevant[:4]:
+                                                            st.markdown(f"• [{n['title']}]({n['link']}) *{n['date']}*")
+                                                        news_found = True
+                                                        break
+                                            except:
+                                                continue
+                                        if not news_found:
+                                            search_name = name.replace(" ", "+")
+                                            st.markdown(f"No news in feeds — [Search Google News for {name}](https://www.google.com/search?q={search_name}+golf&tbm=nws)")
                                     except Exception as e:
-                                        st.info("News search unavailable.")
+                                        search_name = name.replace(" ", "+")
+                                        st.markdown(f"[Search Google News for {name}](https://www.google.com/search?q={search_name}+golf&tbm=nws)")
                                 if st.button("Close", key=f"close_news_{name}"):
                                     st.session_state[f"show_news_{name}"] = False
                                     st.rerun()
