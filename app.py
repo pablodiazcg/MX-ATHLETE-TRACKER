@@ -463,8 +463,7 @@ PLAYER_IDS = {
     "Marcelo Garza":            "65558",
     "Jose Cristobal Islas":     "66282",
     "José Cristóbal Islas":     "66282",
-    "José Cristóbal Islas":     "66282",
-    "José de Jesús Rodríguez":  "Y",
+    "José de Jesús Rodríguez":  "32058",
 }
 
 # Tour code for results lookup per player
