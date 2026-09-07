@@ -1091,6 +1091,7 @@ with tab1:
                     with st.expander(f"Past events ({len(past)})"):
                         # Get results data if available
                         results_data = get_results_for_athlete(name)
+                        st.caption(f"📊 {name} — Results: {len(results_data)} | ID: {PLAYER_IDS.get(name, PLAYER_IDS.get(strip_accents(name), 'NOT FOUND'))}")
                         # Build results lookup with fuzzy matching
                         def find_result(event_name, results_list):
                             if not results_list:
