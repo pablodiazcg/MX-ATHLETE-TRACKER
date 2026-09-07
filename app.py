@@ -588,7 +588,6 @@ def fetch_event_and_search(t, targets, tour_name):
 
 
 
-@st.cache_data(ttl=3600)
 def fetch_player_results(player_id, tour_code):
     """Fetch all tournament results for a player including earnings."""
     query = f"""
@@ -619,7 +618,6 @@ def fetch_player_results(player_id, tour_code):
     except:
         return []
 
-@st.cache_data(ttl=3600)
 def fetch_finish_position(tournament_id, player_id):
     """Get finish position from leaderboard for a specific player."""
     query = f"""
@@ -649,12 +647,26 @@ def fetch_finish_position(tournament_id, player_id):
 
 def get_results_for_athlete(name):
     """Get full results history for an athlete if we have their ID."""
+    # Try exact match first, then strip accents
     player_id = PLAYER_IDS.get(name)
     tour_code = PLAYER_TOUR_CODE.get(name)
+
+    # Try accent-stripped version if not found
+    if not player_id:
+        name_stripped = strip_accents(name)
+        for k, v in PLAYER_IDS.items():
+            if strip_accents(k) == name_stripped:
+                player_id = v
+                tour_code = PLAYER_TOUR_CODE.get(k)
+                break
+
     if not player_id or not tour_code:
         return []
 
-    tournaments = fetch_player_results(player_id, tour_code)
+    try:
+        tournaments = fetch_player_results(player_id, tour_code)
+    except Exception as e:
+        return []
     results = []
     for t in tournaments:
         ov = t.get("tournamentOverview")
@@ -797,11 +809,21 @@ def build_athlete_data(mexican_golfers, manual_exemptions={}):
     # Add possible events for tour members and exempt entries
     for name in mexican_golfers:
         possible = get_possible_events(name, upcoming_by_tour, manual_exemptions)
-        # Only add as possible if not already confirmed in that event
         confirmed_names = [e["name"].lower() for e in athletes[name]["events"]]
         for p in possible:
             if not any(fuzz.token_sort_ratio(p["name"].lower(), c) >= 80 for c in confirmed_names):
                 athletes[name]["possible"].append(p)
+
+    # Deduplicate events for each athlete
+    for name in mexican_golfers:
+        seen = set()
+        deduped = []
+        for e in athletes[name]["events"]:
+            key = f"{e['name']}_{e['date']}"
+            if key not in seen:
+                seen.add(key)
+                deduped.append(e)
+        athletes[name]["events"] = deduped
 
     return athletes
 
