@@ -995,11 +995,11 @@ with tab1:
                                     st.markdown(f'<div class="highlight-item">⭐ {h}</div>', unsafe_allow_html=True)
 
                         # News popup button
-                        if st.button(f"📰 Latest News — {name.split()[0]}", key=f"news_{name}"):
-                            st.session_state[f"show_news_{name}"] = True
+                        if st.button(f"📰 Latest News — {name.split()[0]}", key=f"news_{name}_{tour}"):
+                            st.session_state[f"show_news_{name}_{tour}"] = True
 
                         # News popup
-                        if st.session_state.get(f"show_news_{name}"):
+                        if st.session_state.get(f"show_news_{name}_{tour}"):
                             with st.container():
                                 st.markdown(f"---\n**📰 Recent News: {name}**")
                                 with st.spinner("Searching for latest news..."):
@@ -1043,8 +1043,8 @@ with tab1:
                                     except Exception as e:
                                         search_name = name.replace(" ", "+")
                                         st.markdown(f"[Search Google News for {name}](https://www.google.com/search?q={search_name}+golf&tbm=nws)")
-                                if st.button("Close", key=f"close_news_{name}"):
-                                    st.session_state[f"show_news_{name}"] = False
+                                if st.button("Close", key=f"close_news_{name}_{tour}"):
+                                    st.session_state[f"show_news_{name}_{tour}"] = False
                                     st.rerun()
                 with cb:
                     st.markdown(f'<div style="text-align:right"><div style="font-family:Bebas Neue,sans-serif;font-size:2rem;color:#006847">{len(upcoming)}</div><div style="font-size:0.7rem;color:#666;text-transform:uppercase">Upcoming</div></div>', unsafe_allow_html=True)
