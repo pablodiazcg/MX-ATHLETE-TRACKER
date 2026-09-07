@@ -454,29 +454,38 @@ ATHLETE_DB = {
 
 # Player IDs for results lookup
 PLAYER_IDS = {
+    # With accents
     "Omar Morales":             "64690",
     "Emilio Gonzalez":          "59567",
     "Rodolfo Cazaubon":         "45702",
-    "Sebastian Vazquez":        "35469",
+    "Sebastián Vázquez":        "35469",
     "Carlos Ortiz":             "33667",
     "Abraham Ancer":            "45526",
     "Marcelo Garza":            "65558",
-    "Jose Cristobal Islas":     "66282",
     "José Cristóbal Islas":     "66282",
     "José de Jesús Rodríguez":  "32058",
+    # Without accents
+    "Sebastian Vazquez":        "35469",
+    "Jose Cristobal Islas":     "66282",
+    "Jose de Jesus Rodriguez":  "32058",
 }
 
 # Tour code for results lookup per player
 PLAYER_TOUR_CODE = {
+    # With accents
     "Omar Morales":             "Y",
     "Emilio Gonzalez":          "R",
     "Rodolfo Cazaubon":         "H",
-    "Sebastian Vazquez":        "H",
+    "Sebastián Vázquez":        "H",
     "Carlos Ortiz":             "R",
     "Abraham Ancer":            "R",
     "Marcelo Garza":            "Y",
-    "Jose Cristobal Islas":     "Y",
+    "José Cristóbal Islas":     "Y",
     "José de Jesús Rodríguez":  "Y",
+    # Without accents
+    "Sebastian Vazquez":        "H",
+    "Jose Cristobal Islas":     "Y",
+    "Jose de Jesus Rodriguez":  "Y",
 }
 
 LIV_ROSTER_2026 = [
@@ -944,7 +953,7 @@ with tab1:
     if not filtered_athletes:
         st.markdown('<div class="no-results">No athletes match your search.</div>', unsafe_allow_html=True)
     else:
-        for name in filtered_athletes:
+        for athlete_idx, name in enumerate(filtered_athletes):
             data = athlete_data.get(name,{"events":[],"tour":"Unknown"})
             all_events = sorted(data["events"], key=lambda x:x["date"])
             upcoming = [e for e in all_events if today<=e["date"]<=cutoff]
@@ -994,11 +1003,11 @@ with tab1:
                                     st.markdown(f'<div class="highlight-item">⭐ {h}</div>', unsafe_allow_html=True)
 
                         # News popup button
-                        if st.button(f"📰 Latest News — {name.split()[0]}", key=f"news_{name}_{tour}"):
-                            st.session_state[f"show_news_{name}_{tour}"] = True
+                        if st.button(f"📰 Latest News — {name.split()[0]}", key=f"news_{athlete_idx}_{name}_{tour}"):
+                            st.session_state[f"show_news_{athlete_idx}_{name}_{tour}"] = True
 
                         # News popup
-                        if st.session_state.get(f"show_news_{name}_{tour}"):
+                        if st.session_state.get(f"show_news_{athlete_idx}_{name}_{tour}"):
                             with st.container():
                                 st.markdown(f"---\n**📰 Recent News: {name}**")
                                 with st.spinner("Searching for latest news..."):
@@ -1042,8 +1051,8 @@ with tab1:
                                     except Exception as e:
                                         search_name = name.replace(" ", "+")
                                         st.markdown(f"[Search Google News for {name}](https://www.google.com/search?q={search_name}+golf&tbm=nws)")
-                                if st.button("Close", key=f"close_news_{name}_{tour}"):
-                                    st.session_state[f"show_news_{name}_{tour}"] = False
+                                if st.button("Close", key=f"close_news_{athlete_idx}_{name}_{tour}"):
+                                    st.session_state[f"show_news_{athlete_idx}_{name}_{tour}"] = False
                                     st.rerun()
                 with cb:
                     st.markdown(f'<div style="text-align:right"><div style="font-family:Bebas Neue,sans-serif;font-size:2rem;color:#006847">{len(upcoming)}</div><div style="font-size:0.7rem;color:#666;text-transform:uppercase">Upcoming</div></div>', unsafe_allow_html=True)
