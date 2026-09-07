@@ -147,11 +147,13 @@ TOUR_MEMBERSHIP = {
     "Rodolfo Cazaubon":       "Y",   # PGA Tour Americas
     "Jose Cristobal Islas":   "Y",   # PGA Tour Americas
     "José Cristóbal Islas":    "Y",
+    "José Cristóbal Islas":    "Y",
     "Luis Carrera":           "Y",   # PGA Tour Americas
     "Sebastian Vazquez":      "Y",   # PGA Tour Americas
     "Julio Arronte":          "Y",   # PGA Tour Americas
     "Marcelo Garza":          "Y",   # PGA Tour Americas
     "Jose Cristobal Islas":   "Y",   # PGA Tour Americas
+    "José Cristóbal Islas":    "Y",
     "José Cristóbal Islas":    "Y",
 }
 
@@ -460,6 +462,7 @@ PLAYER_IDS = {
     "Abraham Ancer":            "45526",
     "Marcelo Garza":            "65558",
     "Jose Cristobal Islas":     "66282",
+    "José Cristóbal Islas":     "66282",
     "José Cristóbal Islas":     "66282",
     "José de Jesús Rodríguez":  "Y",
 }
