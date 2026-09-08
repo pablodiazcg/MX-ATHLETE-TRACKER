@@ -1103,7 +1103,17 @@ with tab1:
                     with st.expander(f"Past events ({len(past)})"):
                         # Get results data if available
                         results_data = get_results_for_athlete(name)
-                        st.caption(f"📊 {name} — Results: {len(results_data)} | ID: {PLAYER_IDS.get(name, PLAYER_IDS.get(strip_accents(name), 'NOT FOUND'))}")
+                        # Debug: show fuzzy match result
+                        name_clean = strip_accents(name.lower().strip())
+                        best_score = 0
+                        best_key = None
+                        for k in PLAYER_IDS.keys():
+                            score = fuzz.token_sort_ratio(name_clean, strip_accents(k.lower().strip()))
+                            if score > best_score:
+                                best_score = score
+                                best_key = k
+                        found_id = PLAYER_IDS.get(best_key, "NOT FOUND") if best_score >= 85 else "NO MATCH"
+                        st.caption(f"📊 '{name}' → best match: '{best_key}' ({best_score}%) → ID: {found_id} → Results: {len(results_data)}")
                         # Build results lookup with fuzzy matching
                         def find_result(event_name, results_list):
                             if not results_list:
