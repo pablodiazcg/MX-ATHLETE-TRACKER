@@ -454,38 +454,32 @@ ATHLETE_DB = {
 
 # Player IDs for results lookup
 PLAYER_IDS = {
-    # With accents
-    "Omar Morales":             "64690",
-    "Emilio Gonzalez":          "59567",
-    "Rodolfo Cazaubon":         "45702",
-    "Sebastián Vázquez":        "35469",
-    "Carlos Ortiz":             "33667",
-    "Abraham Ancer":            "45526",
-    "Marcelo Garza":            "65558",
-    "José Cristóbal Islas":     "66282",
-    "José de Jesús Rodríguez":  "32058",
-    # Without accents
-    "Sebastian Vazquez":        "35469",
-    "Jose Cristobal Islas":     "66282",
-    "Jose de Jesus Rodriguez":  "32058",
+    "Omar Morales":            "64690",
+    "Emilio Gonzalez":         "59567",
+    "Rodolfo Cazaubon":        "45702",
+    "Sebastian Vazquez":       "35469",
+    "Carlos Ortiz":            "33667",
+    "Abraham Ancer":           "45526",
+    "Marcelo Garza":           "65558",
+    "Carlos Marcelo Garza":    "65558",
+    "Jose Cristobal Islas":    "66282",
+    "Jose de Jesus Rodriguez": "32058",
+    "Alvaro Ortiz":            "39262",
 }
 
 # Tour code for results lookup per player
 PLAYER_TOUR_CODE = {
-    # With accents
-    "Omar Morales":             "Y",
-    "Emilio Gonzalez":          "R",
-    "Rodolfo Cazaubon":         "H",
-    "Sebastián Vázquez":        "H",
-    "Carlos Ortiz":             "R",
-    "Abraham Ancer":            "R",
-    "Marcelo Garza":            "Y",
-    "José Cristóbal Islas":     "Y",
-    "José de Jesús Rodríguez":  "Y",
-    # Without accents
-    "Sebastian Vazquez":        "H",
-    "Jose Cristobal Islas":     "Y",
-    "Jose de Jesus Rodriguez":  "Y",
+    "Omar Morales":            "Y",
+    "Emilio Gonzalez":         "R",
+    "Rodolfo Cazaubon":        "H",
+    "Sebastian Vazquez":       "H",
+    "Carlos Ortiz":            "R",
+    "Abraham Ancer":           "R",
+    "Marcelo Garza":           "Y",
+    "Carlos Marcelo Garza":    "Y",
+    "Jose Cristobal Islas":    "Y",
+    "Jose de Jesus Rodriguez": "Y",
+    "Alvaro Ortiz":            "H",
 }
 
 LIV_ROSTER_2026 = [
