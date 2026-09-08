@@ -655,18 +655,22 @@ def fetch_finish_position(tournament_id, player_id):
 
 def get_results_for_athlete(name):
     """Get full results history for an athlete if we have their ID."""
-    # Try exact match first, then strip accents
-    player_id = PLAYER_IDS.get(name)
-    tour_code = PLAYER_TOUR_CODE.get(name)
+    player_id = None
+    tour_code = None
+    name_clean = strip_accents(name.lower().strip())
 
-    # Try accent-stripped version if not found
-    if not player_id:
-        name_stripped = strip_accents(name)
-        for k, v in PLAYER_IDS.items():
-            if strip_accents(k) == name_stripped:
-                player_id = v
-                tour_code = PLAYER_TOUR_CODE.get(k)
-                break
+    # Try every key in PLAYER_IDS with accent-stripped fuzzy match
+    best_score = 0
+    best_key = None
+    for k in PLAYER_IDS.keys():
+        score = fuzz.token_sort_ratio(name_clean, strip_accents(k.lower().strip()))
+        if score > best_score:
+            best_score = score
+            best_key = k
+
+    if best_score >= 85 and best_key:
+        player_id = PLAYER_IDS[best_key]
+        tour_code = PLAYER_TOUR_CODE.get(best_key)
 
     if not player_id or not tour_code:
         return []
