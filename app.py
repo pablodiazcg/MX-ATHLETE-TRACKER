@@ -1139,58 +1139,6 @@ for col,val,label in [(col1,len(MEXICAN_GOLFERS),"Athletes Tracked"),(col2,activ
         st.markdown(f'<div class="metric-box"><div class="metric-val">{val}</div><div class="metric-label">{label}</div></div>', unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
-# ── THIS WEEK SECTION ─────────────────────────────────────────────────────
-week_start = datetime.now().strftime("%Y-%m-%d")
-week_end = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
-
-this_week_confirmed = []
-this_week_possible = []
-
-for name in MEXICAN_GOLFERS:
-    ath = athlete_data.get(name, {"events": [], "possible": []})
-    gender = "men" if name in MEXICAN_MEN else "women"
-    for e in ath.get("events", []):
-        if week_start <= e["date"] <= week_end:
-            # LPGA events are not confirmed field entries
-            if e.get("tour") == "LPGA Tour":
-                this_week_possible.append({**e, "athlete": name, "gender": gender})
-            else:
-                this_week_confirmed.append({**e, "athlete": name, "gender": gender})
-    for p in ath.get("possible", []):
-        if p.get("date","TBD") != "TBD" and week_start <= p["date"] <= week_end:
-            this_week_possible.append({**p, "athlete": name, "gender": gender})
-
-st.markdown("## 🗓️ This Week")
-
-if not this_week_confirmed and not this_week_possible:
-    st.info("No confirmed events this week yet — fields typically post Tuesday morning.")
-else:
-    for gender, label, emoji in [("men","Men","⛳"),("women","Women","🏌️‍♀️")]:
-        conf = [e for e in this_week_confirmed if e["gender"]==gender]
-        poss = [p for p in this_week_possible if p["gender"]==gender]
-        if not conf and not poss:
-            continue
-        st.markdown(f"### {emoji} {label}")
-        if conf:
-            st.markdown("**✅ Confirmed Competing:**")
-            grouped = {}
-            for e in conf:
-                grouped.setdefault(e["name"], {"event":e,"athletes":[]})["athletes"].append(e["athlete"])
-            for ename, d in grouped.items():
-                e = d["event"]
-                ath_str = " · ".join(d["athletes"])
-                st.markdown(f'<div class="event-card" style="border-left-color:#66bb6a"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{ename} <span class="upcoming-pill">this week</span></p><p class="event-meta">🏌️ {ath_str} &nbsp;|&nbsp; 📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
-        if poss:
-            st.markdown("**🟡 Possibly Competing:**")
-            grouped_p = {}
-            for p in poss:
-                grouped_p.setdefault(p["name"], {"event":p,"athletes":[]})["athletes"].append(p["athlete"])
-            for ename, d in grouped_p.items():
-                p = d["event"]
-                ath_str = " · ".join(d["athletes"])
-                st.markdown(f'<div class="event-card" style="border-left-color:#ffa726;opacity:0.85"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{ename} <span style="background:#2e2a1a;color:#ffa726;border:1px solid #ffa726;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600">possible</span></p><p class="event-meta">🏌️ {ath_str} &nbsp;|&nbsp; 📍 {p["location"]} &nbsp;|&nbsp; {badge(p["tour"])}</p></div><div class="event-date">{p["date"]}</div></div></div>', unsafe_allow_html=True)
-
-st.markdown("---")
 tab1,tab2,tab3 = st.tabs(["👤 By Athlete","📅 Upcoming Events","🗺️ All Schedules"])
 
 with tab1:
