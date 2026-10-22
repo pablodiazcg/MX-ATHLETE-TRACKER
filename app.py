@@ -172,6 +172,14 @@ ATHLETE_DB = {
         "wins": 6,
         "current_ranking": 197,
         "best_ranking": 11,
+        "wins_list": [
+            {"year": 2018, "event": "Emirates Australian Open", "tour": "Asian Tour"},
+            {"year": 2021, "event": "WGC-FedEx St. Jude Invitational", "tour": "PGA Tour"},
+            {"year": 2022, "event": "LIV Golf Boston", "tour": "LIV Golf"},
+            {"year": 2023, "event": "LIV Golf Hong Kong", "tour": "LIV Golf"},
+            {"year": 2024, "event": "LIV Golf Adelaide", "tour": "LIV Golf"},
+            {"year": 2025, "event": "LIV Golf Jeddah", "tour": "LIV Golf"},
+        ],
         "highlights": [
             "2021 WGC-FedEx St. Jude Invitational (PGA Tour win)",
             "2018 Emirates Australian Open",
@@ -245,6 +253,11 @@ ATHLETE_DB = {
         "wins": 3,
         "current_ranking": 36,
         "best_ranking": 36,
+        "wins_list": [
+            {"year": 2018, "event": "Blue Bay LPGA", "tour": "LPGA Tour"},
+            {"year": 2020, "event": "Diamond Resorts Tournament of Champions", "tour": "LPGA Tour"},
+            {"year": 2022, "event": "Dana Open", "tour": "LPGA Tour"},
+        ],
         "highlights": [
             "2022 Dana Open (LPGA win)",
             "2020 Diamond Resorts Tournament of Champions",
@@ -993,10 +1006,31 @@ with tab1:
                         else:
                             st.markdown("**🤝 Sponsors:** *No sponsors on file — [contact us to add]*")
 
+                        # Pro wins dropdown
+                        wins_list = db.get("wins_list", [])
+                        win_count = db.get("wins", 0)
+                        if wins_list:
+                            with st.expander(f"🏆 Pro Wins ({len(wins_list)})"):
+                                for w in sorted(wins_list, key=lambda x: x["year"], reverse=True):
+                                    tour_color = {"PGA Tour": "#66bb6a", "LIV Golf": "#4fc3f7",
+                                                  "LPGA Tour": "#f48fb1", "Korn Ferry Tour": "#ffa726",
+                                                  "Asian Tour": "#80cbc4"}.get(w["tour"], "#aaa")
+                                    st.markdown(f'<div class="highlight-item"><span style="color:{tour_color};font-weight:600">{w["year"]}</span> — {w["event"]} <span style="color:#666;font-size:0.75rem">({w["tour"]})</span></div>', unsafe_allow_html=True)
+                        elif win_count > 0:
+                            with st.expander(f"🏆 Pro Wins ({win_count})"):
+                                # Pull wins from API results
+                                results = get_results_for_athlete(name)
+                                api_wins = [r for r in results if r.get("wins", 0) > 0]
+                                if api_wins:
+                                    for w in api_wins:
+                                        st.markdown(f'<div class="highlight-item">🏆 {w["name"]} <span style="color:#666;font-size:0.75rem">({w.get("location","")})</span></div>', unsafe_allow_html=True)
+                                else:
+                                    st.markdown(f"*{win_count} professional wins — details coming soon*")
+
                         # Career highlights
                         highlights = db.get("highlights", [])
                         if highlights:
-                            with st.expander("🏆 Career Highlights"):
+                            with st.expander("⭐ Career Highlights"):
                                 for h in highlights:
                                     st.markdown(f'<div class="highlight-item">⭐ {h}</div>', unsafe_allow_html=True)
 
