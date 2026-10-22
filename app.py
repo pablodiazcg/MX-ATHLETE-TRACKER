@@ -56,14 +56,27 @@ st.markdown("""
 PGA_HEADERS = {"User-Agent": "Mozilla/5.0", "Content-Type": "application/json", "x-api-key": "da2-gsrx5bibzbb4njvhl7t37wqyl4"}
 
 DEFAULT_MEXICAN_GOLFERS = [
-    "Abraham Ancer","Carlos Ortiz","Álvaro Ortiz","Rodolfo Cazaubon",
-    "José de Jesús Rodríguez","Roberto Díaz","Santiago de La Fuente",
-    "Emilio Gonzalez","Raul Pereda","Jose Cristobal Islas","Omar Morales",
-    "Luis Carrera","Sebastian Vazquez","Julio Arronte","Yael Chahin",
-    "Gaby Lopez","Isabella Fierro","Lauren Olivares","Maria Fassi",
-    "Marcelo Garza",
+    "Abraham Ancer",
+    "Carlos Ortiz",
+    "Alvaro Ortiz",
+    "Rodolfo Cazaubon",
+    "Jose de Jesus Rodriguez",
+    "Roberto Diaz",
+    "Santiago de La Fuente",
+    "Emilio Gonzalez",
+    "Raul Pereda",
     "Jose Cristobal Islas",
-    "José de Jesús Rodríguez",
+    "Omar Morales",
+    "Luis Carrera",
+    "Sebastian Vazquez",
+    "Julio Arronte",
+    "Yael Chahin",
+    "Roberto Lebrija",
+    "Gaby Lopez",
+    "Isabella Fierro",
+    "Lauren Olivares",
+    "Maria Fassi",
+    "Marcelo Garza",
 ]
 
 
