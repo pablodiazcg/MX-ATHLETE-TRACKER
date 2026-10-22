@@ -1139,7 +1139,7 @@ for col,val,label in [(col1,len(MEXICAN_GOLFERS),"Athletes Tracked"),(col2,activ
         st.markdown(f'<div class="metric-box"><div class="metric-val">{val}</div><div class="metric-label">{label}</div></div>', unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
-tab1,tab2,tab3 = st.tabs(["👤 By Athlete","📅 Upcoming Events","🗺️ All Schedules"])
+tab2,tab1,tab3 = st.tabs(["📅 Upcoming Events","👤 By Athlete","🗺️ All Schedules"])
 
 with tab1:
     if verify_on:
