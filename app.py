@@ -153,6 +153,7 @@ TOUR_MEMBERSHIP = {
     "Julio Arronte":          "Y",   # PGA Tour Americas
     "Marcelo Garza":          "Y",   # PGA Tour Americas
     "Jose Cristobal Islas":   "Y",   # PGA Tour Americas
+    "Yael Chahin":            "Y",   # PGA Tour Americas
     "José Cristóbal Islas":    "Y",
     "José Cristóbal Islas":    "Y",
 }
@@ -456,6 +457,53 @@ ATHLETE_DB = {
         "bio": "One of Mexico\'s most decorated professional golfers with 38 wins. Grew up in poverty in Irapuato, sleeping on a dirt floor with six siblings. Nicknamed \'Camarón\' (Shrimp). Multiple tour Order of Merit winner and a true Mexican golf legend.",
     },
 
+        "Yael Chahin": {
+        "full_name": "Yael Chahin",
+        "born": "2002",
+        "birthplace": "Queretaro, Mexico",
+        "age": 24,
+        "height": "6'2\"",
+        "turned_pro": 2023,
+        "college": "Colorado Mesa University",
+        "wins": 0,
+        "current_ranking": 500,
+        "best_ranking": 500,
+        "wins_list": [],
+        "highlights": [
+            "2022 US Amateur Open Qualifier",
+            "2x All-RMAC selection at Colorado Mesa",
+            "Active PGA Tour Americas competitor",
+            "From Queretaro, Mexico",
+        ],
+        "sponsors": [],
+        "social": {},
+        "bio": "Young Mexican professional from Queretaro. Attended Colorado Mesa University where he was a two-time All-RMAC selection. Qualified for the 2022 US Amateur Open after surviving a 6-hole playoff at a qualifying event in Mexico City.",
+    },
+    "Roberto Diaz": {
+        "full_name": "Roberto Diaz",
+        "born": "February 3, 1987",
+        "birthplace": "Veracruz, Mexico",
+        "age": 38,
+        "height": "5'6\"",
+        "turned_pro": 2009,
+        "college": "University of South Carolina Aiken",
+        "wins": 2,
+        "current_ranking": 462,
+        "best_ranking": 250,
+        "wins_list": [
+            {"year": 2017, "event": "Korn Ferry Tour win", "tour": "Korn Ferry Tour"},
+            {"year": 2014, "event": "Central American Games Gold Medal", "tour": "International"},
+        ],
+        "highlights": [
+            "Korn Ferry Tour winner",
+            "2014 Central American Games Gold Medal",
+            "2017 WGC-Mexico Championship participant",
+            "Highest ranked Mexican at 2017 WGC-Mexico",
+        ],
+        "sponsors": [],
+        "social": {},
+        "bio": "Mexican professional from Veracruz. Won on the Korn Ferry Tour and represented Mexico at the WGC-Mexico Championship. Attended University of South Carolina Aiken.",
+    },
     "Lauren Olivares": {
         "full_name": "Lauren Olivares",
         "born": "2000",
@@ -490,6 +538,7 @@ PLAYER_IDS = {
     "Jose Cristobal Islas":    "66282",
     "Jose de Jesus Rodriguez": "32058",
     "Alvaro Ortiz":            "39262",
+    "Yael Chahin":             "66975",
 }
 
 # Tour code for results lookup per player
@@ -505,6 +554,7 @@ PLAYER_TOUR_CODE = {
     "Jose Cristobal Islas":    "Y",
     "Jose de Jesus Rodriguez": "Y",
     "Alvaro Ortiz":            "H",
+    "Yael Chahin":             "Y",
 }
 
 LIV_ROSTER_2026 = [
@@ -1231,3 +1281,4 @@ with tab3:
             pill = '<span class="upcoming-pill">upcoming</span>' if is_up else '<span class="past-pill">completed</span>'
             series_badge = '<span style="background:#1a2e2e;color:#80cbc4;border:1px solid #80cbc4;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px">Int\'l Series</span>' if e["series"] == "International Series" else '<span style="background:#1a1a1a;color:#aaa;border:1px solid #444;border-radius:20px;padding:2px 8px;font-size:0.65rem;letter-spacing:1px">Asian Tour</span>'
             st.markdown(f'<div class="event-card" style="opacity:{"1" if is_up else "0.4"}"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} &nbsp;{pill} &nbsp;{series_badge}</p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; 💰 {e["purse"]}</p></div><div class="event-date">{e["start_date"]}</div></div></div>', unsafe_allow_html=True)
+
