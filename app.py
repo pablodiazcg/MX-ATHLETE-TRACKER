@@ -135,6 +135,7 @@ ASIAN_TOUR_SCHEDULE_2026 = [
 ASIAN_TOUR_MEXICAN_PLAYERS = [
     "Santiago de La Fuente",
     "Carlos Ortiz",  # plays International Series events alongside LIV
+    "Roberto Lebrija",  # plays International Series
 ]
 
 
