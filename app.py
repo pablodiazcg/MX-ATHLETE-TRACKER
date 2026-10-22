@@ -458,17 +458,41 @@ ATHLETE_DB = {
         "bio": "One of Mexico\'s most decorated professional golfers with 38 wins. Grew up in poverty in Irapuato, sleeping on a dirt floor with six siblings. Nicknamed \'Camarón\' (Shrimp). Multiple tour Order of Merit winner and a true Mexican golf legend.",
     },
 
-        "Yael Chahin": {
+            "Roberto Lebrija": {
+        "full_name": "Roberto Lebrija",
+        "born": "March 9, 1999",
+        "birthplace": "Mexico City, Mexico",
+        "age": 27,
+        "height": "6'2\"",
+        "turned_pro": 2023,
+        "college": "Lynn University / University of Oregon",
+        "wins": 0,
+        "current_ranking": 1094,
+        "best_ranking": 1094,
+        "wins_list": [],
+        "highlights": [
+            "Active International Series competitor 2026",
+            "Multiple PGA Tour Americas starts",
+            "PGA Tour starts including Mexico Open and 3M Open",
+            "From Mexico City, Mexico",
+            "Attended Lynn University and University of Oregon",
+        ],
+        "sponsors": [],
+        "social": {},
+        "bio": "Young Mexican professional from Mexico City. Attended Lynn University and University of Oregon. Competing on the Asian Tour International Series alongside PGA Tour and PGA Tour Americas events. One of Mexico\'s most versatile touring professionals.",
+    },
+
+    "Yael Chahin": {
         "full_name": "Yael Chahin",
         "born": "2002",
         "birthplace": "Queretaro, Mexico",
         "age": 24,
         "height": "6'2\"",
-        "turned_pro": 2023,
+        "turned_pro": 2024,
         "college": "Colorado Mesa University",
         "wins": 0,
-        "current_ranking": 500,
-        "best_ranking": 500,
+        "current_ranking": 2511,
+        "best_ranking": 2497,
         "wins_list": [],
         "highlights": [
             "2022 US Amateur Open Qualifier",
@@ -505,17 +529,41 @@ ATHLETE_DB = {
         "social": {},
         "bio": "Mexican professional from Veracruz. Won on the Korn Ferry Tour and represented Mexico at the WGC-Mexico Championship. Attended University of South Carolina Aiken.",
     },
-        "Yael Chahin": {
+            "Roberto Lebrija": {
+        "full_name": "Roberto Lebrija",
+        "born": "March 9, 1999",
+        "birthplace": "Mexico City, Mexico",
+        "age": 27,
+        "height": "6'2\"",
+        "turned_pro": 2023,
+        "college": "Lynn University / University of Oregon",
+        "wins": 0,
+        "current_ranking": 1094,
+        "best_ranking": 1094,
+        "wins_list": [],
+        "highlights": [
+            "Active International Series competitor 2026",
+            "Multiple PGA Tour Americas starts",
+            "PGA Tour starts including Mexico Open and 3M Open",
+            "From Mexico City, Mexico",
+            "Attended Lynn University and University of Oregon",
+        ],
+        "sponsors": [],
+        "social": {},
+        "bio": "Young Mexican professional from Mexico City. Attended Lynn University and University of Oregon. Competing on the Asian Tour International Series alongside PGA Tour and PGA Tour Americas events. One of Mexico\'s most versatile touring professionals.",
+    },
+
+    "Yael Chahin": {
         "full_name": "Yael Chahin",
         "born": "2002",
         "birthplace": "Queretaro, Mexico",
         "age": 24,
         "height": "6'2\"",
-        "turned_pro": 2023,
+        "turned_pro": 2024,
         "college": "Colorado Mesa University",
         "wins": 0,
-        "current_ranking": 500,
-        "best_ranking": 500,
+        "current_ranking": 2511,
+        "best_ranking": 2497,
         "wins_list": [],
         "highlights": [
             "2022 US Amateur Open Qualifier",
@@ -587,6 +635,7 @@ PLAYER_IDS = {
     "Jose de Jesus Rodriguez": "32058",
     "Alvaro Ortiz":            "39262",
     "Yael Chahin":             "66975",
+    "Roberto Lebrija":         "37124",
 }
 
 # Tour code for results lookup per player
@@ -603,6 +652,7 @@ PLAYER_TOUR_CODE = {
     "Jose de Jesus Rodriguez": "Y",
     "Alvaro Ortiz":            "H",
     "Yael Chahin":             "Y",
+    "Roberto Lebrija":         "R",
 }
 
 LIV_ROSTER_2026 = [
