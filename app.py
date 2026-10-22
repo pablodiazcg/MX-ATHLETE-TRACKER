@@ -908,6 +908,34 @@ def get_results_for_athlete(name):
 
     return results
 
+
+def get_event_link(event_name, tour):
+    """Generate direct link to tournament page based on tour."""
+    slug = event_name.lower()
+    slug = strip_accents(slug)
+    slug = slug.replace("&", "and").replace("'", "").replace(".", "")
+    slug = "-".join(slug.split())
+    # Remove common words that mess up slugs
+    for word in ["presented-by", "the-", "at-the", "at-"]:
+        slug = slug.replace(word, "")
+    slug = slug.strip("-").replace("--", "-")
+
+    if tour == "PGA Tour":
+        return f"https://www.pgatour.com/tournaments/{slug}"
+    elif tour == "Korn Ferry Tour":
+        return f"https://www.pgatour.com/korn-ferry-tour/tournaments/{slug}"
+    elif tour == "PGA Tour Americas":
+        return f"https://www.pgatour.com/americas/tournaments/{slug}"
+    elif tour == "LPGA Tour":
+        return f"https://www.lpga.com/tournaments/{slug}"
+    elif tour == "LIV Golf":
+        return f"https://www.livgolf.com/events"
+    elif "Asian Tour" in tour:
+        return f"https://www.asiantour.com/tournaments"
+    else:
+        search = event_name.replace(" ", "+")
+        return f"https://www.google.com/search?q={search}+golf+2026"
+
 def get_possible_events(name, upcoming_by_tour, manual_exemptions):
     """Get events player could possibly enter based on tour membership + manual exemptions."""
     possible = []
@@ -1298,8 +1326,8 @@ with tab1:
                         confirmed_for_player = lpga_confirmed.get(name, [])
                         for e in combined:
                             is_confirmed = any(fuzz.token_sort_ratio(e["name"].lower(), c.lower()) >= 80 for c in confirmed_for_player)
-                            search_name = e["name"].replace(" ", "+")
-                            event_link = f'<a href="https://www.google.com/search?q={search_name}+golf+2026" target="_blank" style="color:#4fc3f7;font-size:0.75rem;text-decoration:none">🔗 info</a>'
+                            event_link_url = get_event_link(e["name"], e["tour"])
+                            event_link = f'<a href="{event_link_url}" target="_blank" style="color:#4fc3f7;font-size:0.75rem;text-decoration:none">🔗 info</a>'
                             if is_confirmed:
                                 st.markdown(f'<div class="event-card" style="border-left-color:#66bb6a"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span class="upcoming-pill">confirmed</span> &nbsp;{event_link}</p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])} &nbsp;|&nbsp; 💰 {e.get("purse","")}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
                             else:
@@ -1380,8 +1408,8 @@ with tab2:
                 is_possible = e.get("status") == "possible"
                 status_badge = '<span style="background:#2e2a1a;color:#ffa726;border:1px solid #ffa726;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600">possible</span>' if is_possible else '<span class="upcoming-pill">confirmed</span>'
                 card_color = "#ffa726" if is_possible else "#006847"
-                search_name = e["name"].replace(" ", "+")
-                event_link = f'<a href="https://www.google.com/search?q={search_name}+golf+2026" target="_blank" style="color:#4fc3f7;font-size:0.75rem;text-decoration:none">🔗 info</a>'
+                event_link_url = get_event_link(e["name"], e["tour"])
+                event_link = f'<a href="{event_link_url}" target="_blank" style="color:#4fc3f7;font-size:0.75rem;text-decoration:none">🔗 info</a>'
                 st.markdown(f'<div class="event-card" style="border-left-color:{card_color}"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} &nbsp;{status_badge} &nbsp;{event_link}</p><p class="event-meta">🏌️ <strong>{e["athlete"]}</strong> &nbsp;|&nbsp; 📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])}{purse_str}</p></div><div class="event-date">{date}</div></div></div>', unsafe_allow_html=True)
 
 with tab3:
