@@ -1298,10 +1298,12 @@ with tab1:
                         confirmed_for_player = lpga_confirmed.get(name, [])
                         for e in combined:
                             is_confirmed = any(fuzz.token_sort_ratio(e["name"].lower(), c.lower()) >= 80 for c in confirmed_for_player)
+                            search_name = e["name"].replace(" ", "+")
+                            event_link = f'<a href="https://www.google.com/search?q={search_name}+golf+2026" target="_blank" style="color:#4fc3f7;font-size:0.75rem;text-decoration:none">🔗 info</a>'
                             if is_confirmed:
-                                st.markdown(f'<div class="event-card" style="border-left-color:#66bb6a"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span class="upcoming-pill">confirmed</span></p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])} &nbsp;|&nbsp; 💰 {e.get("purse","")}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
+                                st.markdown(f'<div class="event-card" style="border-left-color:#66bb6a"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span class="upcoming-pill">confirmed</span> &nbsp;{event_link}</p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])} &nbsp;|&nbsp; 💰 {e.get("purse","")}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
                             else:
-                                st.markdown(f'<div class="event-card" style="border-left-color:#f48fb1"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span style="background:#2a1a2e;color:#f48fb1;border:1px solid #f48fb1;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px">possible</span></p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])} &nbsp;|&nbsp; 💰 {e.get("purse","")}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
+                                st.markdown(f'<div class="event-card" style="border-left-color:#f48fb1"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} <span style="background:#2a1a2e;color:#f48fb1;border:1px solid #f48fb1;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px">possible</span> &nbsp;{event_link}</p><p class="event-meta">📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])} &nbsp;|&nbsp; 💰 {e.get("purse","")}</p></div><div class="event-date">{e["date"]}</div></div></div>', unsafe_allow_html=True)
                         if not combined:
                             st.caption("⚠️ LPGA fields post Tuesday of event week.")
                     else:
@@ -1375,7 +1377,12 @@ with tab2:
             st.markdown(f"#### 📆 {datetime.strptime(date,'%Y-%m-%d').strftime('%B %d, %Y')}")
             for e in events:
                 purse_str=f"&nbsp;|&nbsp; 💰 {e['purse']}" if e.get("purse") and e["purse"] not in ["N/A","$0",""] else ""
-                st.markdown(f'<div class="event-card"><p class="event-name">{e["name"]}</p><p class="event-meta">🏌️ <strong>{e["athlete"]}</strong> &nbsp;|&nbsp; 📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])}{purse_str}</p></div>', unsafe_allow_html=True)
+                is_possible = e.get("status") == "possible"
+                status_badge = '<span style="background:#2e2a1a;color:#ffa726;border:1px solid #ffa726;border-radius:20px;padding:2px 8px;font-size:0.65rem;font-weight:600">possible</span>' if is_possible else '<span class="upcoming-pill">confirmed</span>'
+                card_color = "#ffa726" if is_possible else "#006847"
+                search_name = e["name"].replace(" ", "+")
+                event_link = f'<a href="https://www.google.com/search?q={search_name}+golf+2026" target="_blank" style="color:#4fc3f7;font-size:0.75rem;text-decoration:none">🔗 info</a>'
+                st.markdown(f'<div class="event-card" style="border-left-color:{card_color}"><div style="display:flex;justify-content:space-between;align-items:center"><div><p class="event-name">{e["name"]} &nbsp;{status_badge} &nbsp;{event_link}</p><p class="event-meta">🏌️ <strong>{e["athlete"]}</strong> &nbsp;|&nbsp; 📍 {e["location"]} &nbsp;|&nbsp; {badge(e["tour"])}{purse_str}</p></div><div class="event-date">{date}</div></div></div>', unsafe_allow_html=True)
 
 with tab3:
     st.markdown("#### Full 2026 Schedules")
