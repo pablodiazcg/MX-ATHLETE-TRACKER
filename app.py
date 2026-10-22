@@ -1151,7 +1151,11 @@ for name in MEXICAN_GOLFERS:
     gender = "men" if name in MEXICAN_MEN else "women"
     for e in ath.get("events", []):
         if week_start <= e["date"] <= week_end:
-            this_week_confirmed.append({**e, "athlete": name, "gender": gender})
+            # LPGA events are not confirmed field entries
+            if e.get("tour") == "LPGA Tour":
+                this_week_possible.append({**e, "athlete": name, "gender": gender})
+            else:
+                this_week_confirmed.append({**e, "athlete": name, "gender": gender})
     for p in ath.get("possible", []):
         if p.get("date","TBD") != "TBD" and week_start <= p["date"] <= week_end:
             this_week_possible.append({**p, "athlete": name, "gender": gender})
